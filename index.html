@@ -1,454 +1,89 @@
 <!doctype html>
-<html lang="en">
+<html>
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<meta name="color-scheme" content="light">
-<meta name="theme-color" content="#ffffff">
-<title>ToolZen Hub — Single Page (Categories + BMI + EMI)</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ToolZen Hub</title>
 <style>
   :root{
-    --green-700:#2E7D32;
-    --green-600:#4CAF50;
-    --green-100:#E8F5E9;
-    --bg:#ffffff;
-    --muted:#666666;
-    --border:#E6E6E6;
-    --card-shadow: 0 6px 18px rgba(46,125,50,0.06);
-    --radius:12px;
-    --max-width:1100px;
-    --gap:20px;
-    --header-h:68px;
+    --green:#2E7D32; --accent:#4CAF50; --muted:#666; --border:#E6E6E6; --bg:#fff;
   }
-  *{box-sizing:border-box;font-family:Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;}
-  html,body{height:100%;background:var(--bg);color:#222;margin:0;}
-  a{color:inherit;text-decoration:none}
-  .container{max-width:var(--max-width);margin:0 auto;padding:28px;}
-  /* Header */
-  header{
-    position:sticky;top:0;z-index:70;background:rgba(255,255,255,0.98);
-    backdrop-filter: blur(6px);border-bottom:1px solid var(--border);
-    height:var(--header-h);display:flex;align-items:center;
-  }
-  .header-inner{max-width:var(--max-width);margin:0 auto;padding:0 24px;display:flex;align-items:center;gap:12px;}
-  .left-group{display:flex;align-items:center;gap:8px}
-  .hamburger{width:44px;height:44px;border-radius:10px;display:flex;align-items:center;justify-content:center;cursor:pointer;border:1px solid transparent;background:#fff}
-  .hamburger:focus{outline:3px solid rgba(76,175,80,0.15)}
-  .brand{font-weight:700;color:var(--green-700);font-size:18px;display:flex;align-items:center;gap:10px;cursor:pointer}
-  .brand .dot{width:10px;height:10px;border-radius:3px;background:var(--green-600);box-shadow:0 0 0 4px rgba(76,175,80,0.07)}
-  .spacer{flex:1}
-  /* Hero */
-  .hero{padding:44px 24px;border-radius:14px;background:linear-gradient(180deg, rgba(232,245,233,0.6), rgba(255,255,255,0.6));margin:24px 0;box-shadow:var(--card-shadow)}
-  .hero h1{margin:0;font-size:26px;color:var(--green-700);}
-  .hero p{margin:8px 0 18px;color:var(--muted)}
-  /* Search */
-  .search-wrap{display:flex;align-items:center;gap:12px;max-width:900px;}
-  .search{
-    flex:1;background:#fff;border-radius:999px;padding:12px 16px;border:1px solid var(--border);display:flex;align-items:center;gap:12px;box-shadow:0 1px 0 rgba(0,0,0,0.02)
-  }
-  .search input{border:0;outline:none;font-size:16px;width:100%;background:transparent}
-  .search .icon{font-size:18px;color:var(--green-700)}
-  /* Categories grid */
-  .section-title{display:flex;align-items:center;justify-content:space-between;margin:26px 0 12px}
-  .grid{display:grid;gap:var(--gap)}
+  body{font-family:Inter,system-ui,Arial;margin:0;background:var(--bg);color:#111}
+  .container{max-width:1100px;margin:0 auto;padding:20px}
+  .hero{background:linear-gradient(180deg, rgba(232,245,233,0.6), #fff);padding:20px;border-radius:10px;border:1px solid var(--border)}
+  .grid{display:grid;gap:16px;margin-top:12px}
   .grid.cols-3{grid-template-columns:repeat(3,1fr)}
-  .card{
-    background:#fff;padding:16px;border-radius:12px;border:1px solid var(--border);
-    display:flex;flex-direction:column;gap:10px;align-items:flex-start;cursor:pointer;box-shadow:var(--card-shadow);transition:transform .16s,box-shadow .16s;
-  }
-  .card:hover{transform:translateY(-6px);box-shadow:0 14px 36px rgba(46,125,50,0.08)}
-  .card .icon{width:44px;height:44px;border-radius:10px;display:flex;align-items:center;justify-content:center;background:var(--green-100);color:var(--green-700);font-weight:700}
-  .card small{color:var(--muted)}
-  /* Featured tools */
-  .tools-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px}
-  .tool-card{display:flex;gap:12px;align-items:center;padding:16px;border-radius:10px;border:1px solid var(--border);background:#fff;cursor:pointer}
-  .tool-card .logo{width:56px;height:48px;border-radius:8px;background:var(--green-100);display:flex;align-items:center;justify-content:center;color:var(--green-700);font-weight:700}
-  .tool-card h4{margin:0}
-  .tool-card p{margin:2px 0 0;color:var(--muted);font-size:13px}
-  /* Footer */
-  footer{border-top:1px solid var(--border);padding:20px;margin-top:30px;background:transparent}
-  footer .fwrap{max-width:var(--max-width);margin:0 auto;padding:0 24px;display:flex;align-items:center;justify-content:space-between;color:var(--muted)}
-  /* Drawer */
-  .drawer-backdrop{position:fixed;inset:0;background:rgba(0,0,0,0.28);opacity:0;visibility:hidden;transition:opacity .18s;z-index:80}
-  .drawer{position:fixed;right:0;top:0;height:100%;width:320px;background:#fff;border-left:1px solid var(--border);transform:translateX(120%);transition:transform .22s;z-index:90;padding:20px;display:flex;flex-direction:column;gap:12px}
-  .drawer.open{transform:translateX(0)}
-  .drawer-backdrop.open{opacity:1;visibility:visible}
-  .drawer .close{align-self:flex-end;padding:6px;border-radius:8px;cursor:pointer}
-  .drawer a{display:block;padding:10px 8px;border-radius:8px;color:var(--green-700)}
-  /* Category view modal */
-  .category-view{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%) scale(0.98);width:min(820px,96%);background:#fff;border-radius:14px;padding:18px;border:1px solid var(--border);box-shadow:0 28px 80px rgba(46,125,50,0.12);z-index:120;visibility:hidden;opacity:0;transition:opacity .16s,transform .16s}
-  .category-view.open{visibility:visible;opacity:1;transform:translate(-50%,-50%) scale(1)}
-  .category-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-top:12px}
-  .category-tool{padding:12px;border-radius:10px;border:1px solid var(--border);display:flex;gap:12px;align-items:center;cursor:pointer;background:#fff}
-  /* Tool view */
-  .tool-view{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%) scale(0.98);width:min(720px,94%);background:#fff;border-radius:14px;padding:20px;border:1px solid var(--border);box-shadow:0 28px 80px rgba(46,125,50,0.12);z-index:130;visibility:hidden;opacity:0;transition:opacity .16s,transform .16s}
-  .tool-view.open{visibility:visible;opacity:1;transform:translate(-50%,-50%) scale(1)}
-  .tool-view header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
-  .tool-body{display:grid;grid-template-columns:1fr 260px;gap:16px}
-  .form-row{display:flex;flex-direction:column;gap:6px}
-  .form-row input{padding:10px;border-radius:8px;border:1px solid var(--border);font-size:15px}
-  .btn{display:inline-flex;align-items:center;gap:8px;padding:10px 14px;border-radius:999px;border:0;background:var(--green-600);color:#fff;cursor:pointer;font-weight:600}
-  .btn.ghost{background:#fff;border:1px solid var(--green-600);color:var(--green-600)}
-  .result-box{background:var(--green-100);padding:14px;border-radius:10px;border:1px solid rgba(76,175,80,0.08)}
-  .breadcrumbs{font-size:13px;color:var(--muted);margin:10px 0}
-  @media (max-width:980px){
-    .tools-grid{grid-template-columns:1fr}
-    .grid.cols-3{grid-template-columns:repeat(2,1fr)}
-    .tool-body{grid-template-columns:1fr}
-    .category-grid{grid-template-columns:1fr}
-  }
-  @media (max-width:640px){
-    .grid.cols-3{grid-template-columns:1fr}
-    header .header-inner{padding:0 12px}
-    .hero{padding:18px}
-  }
+  .card{background:#fff;padding:12px;border-radius:10px;border:1px solid var(--border);cursor:pointer}
+  .tools-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-top:12px}
+  @media (max-width:900px){ .grid.cols-3{grid-template-columns:repeat(2,1fr)} }
+  @media (max-width:560px){ .grid.cols-3{grid-template-columns:1fr} .tools-grid{grid-template-columns:1fr} }
 </style>
 </head>
 <body>
 
-<header aria-label="Global header">
-  <div class="header-inner">
-    <div class="left-group">
-      <button class="hamburger" id="hamburger" aria-label="Open menu" aria-expanded="false">☰</button>
-      <div class="brand" id="brand" title="ToolZen Hub — Home">
-        <div class="dot" aria-hidden="true"></div>
-        <div>ToolZen Hub</div>
-      </div>
+<!-- header injected here -->
+<div id="header-placeholder"></div>
+
+<main class="container">
+  <section class="hero">
+    <h1 style="color:var(--green)">All-in-One Tools Hub for Daily Productivity</h1>
+    <p style="color:var(--muted)">Calculators • Generators • Converters • More</p>
+
+    <div style="display:flex;gap:10px;margin-top:12px">
+      <input id="searchInput" placeholder="Search 200+ tools…" style="flex:1;padding:12px;border-radius:999px;border:1px solid var(--border)">
+      <button id="searchBtn" style="padding:10px 14px;border-radius:999px;background:var(--accent);color:#fff;border:0">Search</button>
     </div>
 
-    <div class="spacer"></div>
-  </div>
-</header>
-
-<main class="container" id="main">
-  <!-- Hero / Banner -->
-  <section class="hero" role="region" aria-labelledby="hero-title">
-    <h1 id="hero-title">All-in-One Tools Hub for Daily Productivity</h1>
-    <p>Calculators • Generators • Converters • More</p>
-
-    <div class="search-wrap" style="margin-top:6px">
-      <div class="search" role="search" aria-label="Search tools">
-        <div class="icon" aria-hidden="true">🔍</div>
-        <input id="searchInput" placeholder="Search 200+ tools…" aria-label="Search 200+ tools" autocomplete="off">
-      </div>
-      <button class="btn" id="searchCTA" aria-label="Search">Search</button>
-    </div>
-
-    <div id="searchSuggestions" style="margin-top:10px;color:var(--muted);font-size:13px;display:none"></div>
   </section>
 
-  <!-- Categories -->
-  <div style="display:flex;align-items:center;justify-content:space-between;">
-    <h3 style="margin:0">Categories</h3>
-  </div>
+  <h3 style="margin-top:20px">Categories</h3>
+  <section id="categories" class="grid cols-3"></section>
 
-  <section class="grid cols-3" id="categories" style="margin-top:12px">
-    <div class="card" data-slug="calculators" tabindex="0" role="button" aria-pressed="false">
-      <div class="icon">🧮</div>
-      <div>
-        <strong>Calculators</strong>
-        <div style="height:4px"></div>
-        <small>Quick math & finance tools.</small>
-      </div>
-    </div>
+  <h3 style="margin-top:22px">Featured</h3>
+  <section id="featured" class="tools-grid"></section>
 
-    <div class="card" data-slug="generators" tabindex="0" role="button" aria-pressed="false">
-      <div class="icon">📝</div>
-      <div>
-        <strong>Generators</strong>
-        <div style="height:4px"></div>
-        <small>Create names, text, ideas.</small>
-      </div>
-    </div>
-
-    <div class="card" data-slug="text-tools" tabindex="0" role="button" aria-pressed="false">
-      <div class="icon">🔤</div>
-      <div>
-        <strong>Text Tools</strong>
-        <div style="height:4px"></div>
-        <small>Edit, format, or analyze.</small>
-      </div>
-    </div>
-
-    <div class="card" data-slug="web-tools" tabindex="0" role="button" aria-pressed="false">
-      <div class="icon">🌐</div>
-      <div>
-        <strong>Web Tools</strong>
-        <div style="height:4px"></div>
-        <small>Online utilities.</small>
-      </div>
-    </div>
-
-    <div class="card" data-slug="converters" tabindex="0" role="button" aria-pressed="false">
-      <div class="icon">🔁</div>
-      <div>
-        <strong>Converters</strong>
-        <div style="height:4px"></div>
-        <small>Change formats instantly.</small>
-      </div>
-    </div>
-
-    <div class="card" data-slug="misc" tabindex="0" role="button" aria-pressed="false">
-      <div class="icon">⚙️</div>
-      <div>
-        <strong>Misc Tools</strong>
-        <div style="height:4px"></div>
-        <small>Helpful extras.</small>
-      </div>
-    </div>
-  </section>
-
-  <div class="section-title" style="margin-top:28px">
-    <h3 style="margin:0">Featured Tools</h3>
-  </div>
-
-  <section class="tools-grid" style="margin-bottom:20px">
-    <div class="tool-card" data-tool="bmi-calculator" tabindex="0" role="button">
-      <div class="logo">⭐</div>
-      <div>
-        <h4>BMI Calculator</h4>
-        <p>Quick BMI check.</p>
-      </div>
-    </div>
-
-    <div class="tool-card" data-tool="pdf-to-word" tabindex="0" role="button">
-      <div class="logo">🔥</div>
-      <div>
-        <h4>PDF to Word</h4>
-        <p>Convert instantly.</p>
-      </div>
-    </div>
-
-    <div class="tool-card" data-tool="age-calculator" tabindex="0" role="button">
-      <div class="logo">🕑</div>
-      <div>
-        <h4>Age Calculator</h4>
-        <p>Find age precisely.</p>
-      </div>
-    </div>
-
-    <div class="tool-card" data-tool="random-name" tabindex="0" role="button">
-      <div class="logo">🎲</div>
-      <div>
-        <h4>Random Name Generator</h4>
-        <p>Create names quickly.</p>
-      </div>
-    </div>
-  </section>
-
-  <footer>
-    <div class="fwrap">
-      <div>About | Privacy Policy | Terms of Use</div>
-      <div style="color:var(--muted)">Copyright © ToolZen Hub</div>
-    </div>
-  </footer>
 </main>
 
-<!-- Drawer (right-side) -->
-<div id="drawerBackdrop" class="drawer-backdrop" tabindex="-1" aria-hidden="true"></div>
-<aside id="drawer" class="drawer" aria-hidden="true" role="dialog" aria-label="Main menu">
-  <button class="close" id="drawerClose" aria-label="Close menu">✕</button>
-  <nav>
-    <a href="#" data-nav="home">Home</a>
-    <a href="#" data-nav="about">About</a>
-    <a href="#" data-nav="categories">Categories</a>
-    <a href="#" data-nav="featured">Featured Tools</a>
-    <a href="#" data-nav="privacy">Privacy Policy</a>
-    <a href="#" data-nav="terms">Terms of Use</a>
-    <a href="#" data-nav="copyright">Copyright</a>
-  </nav>
-</aside>
-
-<!-- Category View (lists tools for category) -->
-<section id="categoryView" class="category-view" role="dialog" aria-modal="true" aria-hidden="true">
-  <header style="display:flex;align-items:center;justify-content:space-between;gap:12px">
-    <div>
-      <div style="font-size:13px;color:var(--muted)" id="catBreadcrumb">Home › Category</div>
-      <h3 id="catTitle" style="margin:6px 0 0">Category</h3>
-      <div style="color:var(--muted);font-size:13px;margin-top:6px" id="catDesc">Tools in this category</div>
-    </div>
-    <div>
-      <button id="catClose" class="btn btn-ghost" style="background:#fff;border:0;color:var(--muted)">Close</button>
-    </div>
-  </header>
-
-  <div class="category-grid" id="categoryGrid">
-    <!-- tools inserted here -->
-  </div>
-</section>
-
-<!-- Tool View (BMI, EMI, etc.) -->
-<section id="toolView" class="tool-view" role="dialog" aria-modal="true" aria-hidden="true">
-  <header>
-    <div>
-      <div style="font-size:13px;color:var(--muted)" id="toolBreadcrumb">Home > Calculators > Tool</div>
-      <h2 id="toolTitle" style="margin:6px 0 0">Tool</h2>
-      <div style="color:var(--muted);font-size:13px;margin-top:6px" id="toolDesc">Short description</div>
-    </div>
-    <div style="display:flex;gap:8px;align-items:center">
-      <button id="toolClose" class="btn btn-ghost" style="background:#fff;border:0;color:var(--muted)">Close</button>
-    </div>
-  </header>
-
-  <div class="tool-body" id="toolBody">
-    <!-- left: inputs, right: result -->
-    <div id="toolInputs">
-      <!-- inserted dynamically -->
-    </div>
-
-    <aside id="toolResult">
-      <!-- result inserted dynamically -->
-    </aside>
-  </div>
-</section>
+<!-- footer injected here -->
+<div id="footer-placeholder"></div>
 
 <script>
-  const q = s => document.querySelector(s);
-  const qa = s => Array.from(document.querySelectorAll(s));
-
-  // Basic app data: categories -> tools
-  const CATALOG = {
-    'calculators':{
-      title:'Calculators',
-      desc:'Quick math & finance tools.',
-      tools:[
-        {id:'bmi-calculator', title:'BMI Calculator', desc:'Quick BMI check.', type:'bmi'},
-        {id:'emi-calculator', title:'EMI Calculator', desc:'Loan EMI calculator.', type:'emi'}
-      ]
-    },
-    'generators':{
-      title:'Generators',
-      desc:'Create names, text, ideas.',
-      tools:[
-        {id:'random-name', title:'Random Name Generator', desc:'Create names quickly.', type:'random-name'}
-      ]
-    },
-    'text-tools':{title:'Text Tools',desc:'Edit, format, or analyze.',tools:[]},
-    'web-tools':{title:'Web Tools',desc:'Online utilities.',tools:[]},
-    'converters':{title:'Converters',desc:'Change formats instantly.',tools:[]},
-    'misc':{title:'Misc Tools',desc:'Helpful extras.',tools:[]}
-  };
-
-  // Header & drawer
-  const hamburger = q('#hamburger');
-  const drawer = q('#drawer');
-  const backdrop = q('#drawerBackdrop');
-  const drawerClose = q('#drawerClose');
-  const brand = q('#brand');
-
-  function openDrawer(){ drawer.classList.add('open'); backdrop.classList.add('open'); drawer.setAttribute('aria-hidden','false'); backdrop.setAttribute('aria-hidden','false'); hamburger.setAttribute('aria-expanded','true'); drawerClose.focus();}
-  function closeDrawer(){ drawer.classList.remove('open'); backdrop.classList.remove('open'); drawer.setAttribute('aria-hidden','true'); backdrop.setAttribute('aria-hidden','true'); hamburger.setAttribute('aria-expanded','false'); hamburger.focus();}
-  hamburger.addEventListener('click', openDrawer);
-  drawerClose.addEventListener('click', closeDrawer);
-  backdrop.addEventListener('click', closeDrawer);
-
-  // Brand acts as home button: scroll to top + close modals
-  brand.addEventListener('click', ()=> {
-    window.scrollTo({top:0,behavior:'smooth'});
-    closeCategory();
-    closeTool();
+async function loadPartial(path, selector){
+  const res = await fetch(path); const html = await res.text();
+  document.querySelector(selector).innerHTML = html;
+}
+async function loadCatalog(){
+  const r = await fetch('data/tools.json'); return await r.json();
+}
+(async function init(){
+  await loadPartial('partials/header.html','#header-placeholder');
+  await loadPartial('partials/footer.html','#footer-placeholder');
+  const data = await loadCatalog();
+  // render categories
+  const catEl = document.getElementById('categories');
+  data.categories.forEach(c => {
+    const d = document.createElement('div');
+    d.className = 'card';
+    d.innerHTML = `<strong>${c.title}</strong><div style="color:var(--muted)">${c.desc}</div>`;
+    d.addEventListener('click', ()=> location.href = 'category.html?slug=' + encodeURIComponent(c.id));
+    catEl.appendChild(d);
   });
-
-  document.addEventListener('keydown', e => {
-    if(e.key === 'Escape'){
-      if(drawer.classList.contains('open')) closeDrawer();
-      if(q('#categoryView').classList.contains('open')) closeCategory();
-      if(q('#toolView').classList.contains('open')) closeTool();
+  // featured
+  const feat = document.getElementById('featured');
+  data.featured.forEach(fid => {
+    // find tool
+    let tool = null;
+    data.categories.forEach(c=> c.tools.forEach(t=> { if(t.id===fid) tool=t; }));
+    if(tool){
+      const el = document.createElement('div');
+      el.className = 'card';
+      el.innerHTML = `<strong>${tool.title}</strong><div style="color:var(--muted)">${tool.desc}</div>`;
+      el.addEventListener('click', ()=> location.href = 'tool.html?id=' + encodeURIComponent(tool.id));
+      feat.appendChild(el);
     }
   });
+})();
+</script>
+</body>
+</html>
 
-  // Category click: open category modal listing tools
-  qa('#categories .card').forEach(card => {
-    card.addEventListener('click', () => openCategory(card.dataset.slug));
-    card.addEventListener('keydown', e => { if(e.key==='Enter') openCategory(card.dataset.slug); });
-  });
-
-  const categoryView = q('#categoryView');
-  const categoryGrid = q('#categoryGrid');
-  const catTitle = q('#catTitle');
-  const catDesc = q('#catDesc');
-  const catBreadcrumb = q('#catBreadcrumb');
-  const catClose = q('#catClose');
-
-  function openCategory(slug){
-    const cat = CATALOG[slug];
-    if(!cat) return alert('Category not found');
-    catTitle.innerText = cat.title;
-    catDesc.innerText = cat.desc;
-    catBreadcrumb.innerText = 'Home › ' + cat.title;
-    // populate tools
-    categoryGrid.innerHTML = '';
-    if(cat.tools.length === 0){
-      categoryGrid.innerHTML = '<div style="color:var(--muted);padding:12px">No tools in this category yet.</div>';
-    } else {
-      cat.tools.forEach(t => {
-        const el = document.createElement('div');
-        el.className = 'category-tool';
-        el.innerHTML = '<div style="width:48px;height:40px;border-radius:8px;background:var(--green-100);display:flex;align-items:center;justify-content:center;color:var(--green-700);font-weight:700">' + (t.id==='bmi-calculator?'?'⭐':'✦') + '</div>' +
-                       '<div><strong>' + t.title + '</strong><div style="font-size:13px;color:var(--muted)">' + t.desc + '</div></div>';
-        el.tabIndex = 0;
-        el.addEventListener('click', ()=> openToolById(t.id));
-        el.addEventListener('keydown', e => { if(e.key==='Enter') openToolById(t.id); });
-        categoryGrid.appendChild(el);
-      });
-    }
-    categoryView.classList.add('open');
-    categoryView.setAttribute('aria-hidden','false');
-  }
-  function closeCategory(){ categoryView.classList.remove('open'); categoryView.setAttribute('aria-hidden','true'); }
-
-  catClose.addEventListener('click', closeCategory);
-
-  // Tool view logic: open tool by id (from featured or category)
-  const toolView = q('#toolView');
-  const toolTitle = q('#toolTitle');
-  const toolDesc = q('#toolDesc');
-  const toolBreadcrumb = q('#toolBreadcrumb');
-  const toolInputs = q('#toolInputs');
-  const toolResult = q('#toolResult');
-  const toolClose = q('#toolClose');
-
-  function openToolById(id){
-    // find tool in catalog
-    let found = null; let parentCat = null;
-    for(const [slug,cat] of Object.entries(CATALOG)){
-      const t = cat.tools.find(x=>x.id===id);
-      if(t){ found = t; parentCat = cat; break; }
-    }
-    // fallback for featured tools not in catalog
-    if(!found){
-      const extras = {
-        'pdf-to-word':{id:'pdf-to-word',title:'PDF to Word',desc:'Convert PDF to Word',type:'placeholder'},
-        'age-calculator':{id:'age-calculator',title:'Age Calculator',desc:'Find precise age',type:'placeholder'},
-        'random-name':{id:'random-name',title:'Random Name Generator',desc:'Create random names',type:'placeholder'}
-      };
-      found = extras[id] || {id, title:id, desc:'', type:'placeholder'};
-      parentCat = {title:'Featured'};
-    }
-    toolTitle.innerText = found.title;
-    toolDesc.innerText = found.desc;
-    toolBreadcrumb.innerText = 'Home > ' + (parentCat.title || 'Tools') + ' > ' + found.title;
-    // render inputs & result based on type
-    renderTool(found);
-    // close category if open
-    closeCategory();
-    // open tool modal
-    toolView.classList.add('open');
-    toolView.setAttribute('aria-hidden','false');
-  }
-
-  toolClose.addEventListener('click', ()=> { closeTool(); });
-
-  function closeTool(){ toolView.classList.remove('open'); toolView.setAttribute('aria-hidden','true'); }
-
-  // Render tool UI based on type
-  function renderTool(tool){
-    toolInputs.innerHTML = '';
-    toolResult.innerHTML = '';
-    if(tool.type === 'bmi'){
-      toolInputs.innerHTML = `
-        <div class="form-row">
-          <label>Weight (kg)</label>
-          <input id="w_weight" type="number" min="1" value="60">
-        </div>
-  
