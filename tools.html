@@ -1,0 +1,345 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Tool — ToolZen Hub</title>
+<style>
+  :root{
+    --green:#2E7D32; --accent:#4CAF50; --muted:#666666; --border:#E6E6E6; --bg:#ffffff;
+    --max-width:1100px; --gutter:20px;
+  }
+  *{box-sizing:border-box;font-family:Inter, system-ui, -apple-system, "Segoe UI", Roboto, Arial;}
+  body{margin:0;background:var(--bg);color:#111;-webkit-font-smoothing:antialiased}
+  a{color:inherit}
+  .container{max-width:var(--max-width);margin:0 auto;padding:20px}
+  /* breadcrumb + title */
+  .crumb{color:var(--muted);font-size:13px;margin-bottom:8px}
+  h1{margin:4px 0 8px;color:var(--green);font-size:22px}
+  .desc{color:var(--muted);margin-bottom:18px}
+
+  /* layout */
+  .tool-wrap{display:grid;grid-template-columns:1fr 340px;gap:18px;align-items:start}
+  .panel{background:#fff;border:1px solid var(--border);border-radius:10px;padding:14px;box-shadow:0 6px 18px rgba(46,125,50,0.04)}
+  .form-row{display:flex;flex-direction:column;gap:8px;margin-bottom:10px}
+  label{font-size:14px;color:#222}
+  input[type="number"], input[type="date"], select{padding:10px;border-radius:8px;border:1px solid var(--border);font-size:15px}
+  .btn{display:inline-flex;align-items:center;gap:8px;padding:10px 14px;border-radius:999px;border:0;background:var(--accent);color:#fff;cursor:pointer;font-weight:600}
+  .btn.ghost{background:#fff;border:1px solid var(--accent);color:var(--accent)}
+  .result-box{background:rgba(232,245,233,0.9);padding:12px;border-radius:10px;border:1px solid rgba(76,175,80,0.08)}
+  .muted{color:var(--muted);font-size:13px}
+
+  /* shared top actions */
+  .top-actions{display:flex;gap:8px;margin-top:10px}
+
+  /* responsive */
+  @media (max-width:980px){
+    .tool-wrap{grid-template-columns:1fr}
+    .container{padding:14px}
+  }
+
+  @media (max-width:480px){
+    body{font-size:15px}
+    h1{font-size:20px}
+    .tool-wrap{gap:12px}
+    .panel{padding:12px}
+  }
+
+  /* small helpers */
+  .small{font-size:13px;color:var(--muted)}
+  .link-like{background:transparent;border:0;color:var(--green);cursor:pointer;padding:0;font-weight:600}
+</style>
+</head>
+<body>
+
+<!-- header partial -->
+<div id="header-placeholder"></div>
+
+<main class="container" id="main">
+  <a href="index.html" class="small">← Home</a>
+
+  <div id="toolArea" style="margin-top:12px">
+    <!-- breadcrumb/title/desc injected here -->
+    <div class="crumb" id="breadcrumb">Home › Category › Tool</div>
+    <h1 id="toolTitle">Tool Name</h1>
+    <div class="desc" id="toolDesc">Short description</div>
+
+    <div class="tool-wrap" id="toolWrap">
+      <div id="inputs" class="panel" aria-live="polite">
+        <!-- inputs inserted here -->
+      </div>
+      <aside id="result" class="panel">
+        <!-- result inserted here -->
+      </aside>
+    </div>
+  </div>
+</main>
+
+<!-- footer partial -->
+<div id="footer-placeholder"></div>
+
+<script>
+/* Helper short-hands */
+const $ = s => document.querySelector(s);
+const qs = s => Array.from(document.querySelectorAll(s));
+
+/* Load partials and catalog */
+async function loadPartial(path, selector){
+  try{
+    const res = await fetch(path);
+    if(!res.ok) throw new Error('Partial not found');
+    const html = await res.text();
+    document.querySelector(selector).innerHTML = html;
+  }catch(err){
+    // fallback header
+    document.querySelector(selector).innerHTML = '';
+  }
+}
+async function loadCatalog(){
+  const r = await fetch('data/tools.json');
+  if(!r.ok) throw new Error('tools.json not found');
+  return await r.json();
+}
+
+/* Utilities */
+function getParam(name){ return new URLSearchParams(location.search).get(name); }
+function formatNumber(n){ return Number(n).toLocaleString(); }
+
+/* Renderers for each tool type */
+function renderPlaceholder(tool){
+  $('#inputs').innerHTML = '<div class="muted">Tool UI not implemented yet.</div>';
+  $('#result').innerHTML = '<div class="result-box"><div class="muted">Result</div><div style="font-weight:700;margin-top:8px">--</div></div>';
+}
+
+/* BMI */
+function renderBMI(tool){
+  $('#inputs').innerHTML = `
+    <div class="form-row"><label for="bmi_weight">Weight (kg)</label><input id="bmi_weight" type="number" min="1" value="${tool.prefill?.weight||60}"></div>
+    <div class="form-row"><label for="bmi_height">Height (cm)</label><input id="bmi_height" type="number" min="50" value="${tool.prefill?.height||170}"></div>
+    <div class="top-actions"><button id="bmi_calc" class="btn">Calculate BMI</button><button id="bmi_share" class="btn ghost">Share</button></div>
+    <div style="margin-top:10px" class="small">Results will appear on the right. Inputs encoded in URL.</div>
+  `;
+  $('#result').innerHTML = `
+    <div class="result-box">
+      <div class="small">Result</div>
+      <div id="bmi_value" style="font-size:28px;font-weight:700;margin-top:8px">--</div>
+      <div id="bmi_text" class="muted" style="margin-top:6px">--</div>
+    </div>
+  `;
+  const calc = () => {
+    const w = parseFloat($('#bmi_weight').value) || 0;
+    const hcm = parseFloat($('#bmi_height').value) || 0;
+    if(w<=0 || hcm<=0){ $('#bmi_value').innerText='--'; $('#bmi_text').innerText='Enter valid inputs'; return; }
+    const h = hcm/100; const bmi = w/(h*h); const r = Math.round(bmi*10)/10;
+    $('#bmi_value').innerText = r.toFixed(1);
+    let t = 'Normal';
+    if(r < 18.5) t = 'Underweight';
+    else if(r >= 25) t = 'Overweight';
+    if(r >= 30) t = 'Obese';
+    $('#bmi_text').innerText = t;
+    // update URL params
+    const url = new URL(location); url.searchParams.set('id','bmi-calculator'); url.searchParams.set('weight',w); url.searchParams.set('height',hcm);
+    history.replaceState(null,'',url.toString());
+  };
+  $('#bmi_calc').addEventListener('click', calc);
+  $('#bmi_share').addEventListener('click', ()=> {
+    const url = location.href;
+    navigator.clipboard?.writeText(url).then(()=> { $('#bmi_share').innerText = 'Copied!'; setTimeout(()=> $('#bmi_share').innerText = 'Share',1300); }).catch(()=> alert('Copy this link:\\n' + url));
+  });
+  // if URL has weight/height prefill, calculate
+  const params = new URLSearchParams(location.search);
+  if(params.get('weight') || params.get('height')) calc();
+}
+
+/* EMI (same formula as loan) */
+function renderEMI(tool){
+  $('#inputs').innerHTML = `
+    <div class="form-row"><label>Loan Amount (Principal)</label><input id="emi_principal" type="number" min="0" value="${tool.prefill?.P||500000}"></div>
+    <div class="form-row"><label>Annual Interest Rate (%)</label><input id="emi_rate" type="number" min="0" step="0.01" value="${tool.prefill?.r||7.5}"></div>
+    <div class="form-row"><label>Tenure (Years)</label><input id="emi_years" type="number" min="0" value="${tool.prefill?.years||20}"></div>
+    <div class="top-actions"><button id="emi_calc" class="btn">Calculate EMI</button><button id="emi_share" class="btn ghost">Share</button></div>
+    <div style="margin-top:10px" class="small">EMI calculated monthly. Shows monthly EMI and totals.</div>
+  `;
+  $('#result').innerHTML = `
+    <div class="result-box">
+      <div class="small">Monthly EMI</div>
+      <div id="emi_value" style="font-size:22px;font-weight:700;margin-top:8px">--</div>
+      <div style="margin-top:8px" class="small">Total Payment: <span id="emi_total">--</span></div>
+      <div style="margin-top:6px" class="small">Total Interest: <span id="emi_interest">--</span></div>
+    </div>
+  `;
+  const calc = () => {
+    const P = parseFloat($('#emi_principal').value) || 0;
+    const annual = parseFloat($('#emi_rate').value) || 0;
+    const years = parseFloat($('#emi_years').value) || 0;
+    if(P<=0 || years<=0){ $('#emi_value').innerText='--'; $('#emi_total').innerText='--'; $('#emi_interest').innerText='--'; return; }
+    const n = years * 12;
+    const r = (annual/100)/12;
+    const pow = Math.pow(1+r, n);
+    const emi = (P * r * pow) / (pow - 1);
+    const emiRounded = Math.round(emi*100)/100;
+    const total = Math.round(emi * n * 100)/100;
+    const interest = Math.round((total - P) * 100)/100;
+    $('#emi_value').innerText = emiRounded.toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2});
+    $('#emi_total').innerText = total.toLocaleString();
+    $('#emi_interest').innerText = interest.toLocaleString();
+    const url = new URL(location); url.searchParams.set('id','emi-calculator'); url.searchParams.set('P',P); url.searchParams.set('r',annual); url.searchParams.set('years',years);
+    history.replaceState(null,'',url.toString());
+  };
+  $('#emi_calc').addEventListener('click', calc);
+  $('#emi_share').addEventListener('click', ()=> {
+    const url = location.href;
+    navigator.clipboard?.writeText(url).then(()=> { $('#emi_share').innerText = 'Copied!'; setTimeout(()=> $('#emi_share').innerText = 'Share',1300); }).catch(()=> alert('Copy this link:\\n' + url));
+  });
+  // auto-calc if params exist
+  const params = new URLSearchParams(location.search);
+  if(params.get('P') || params.get('r') || params.get('years')) calc();
+}
+
+/* Age calculator */
+function renderAge(tool){
+  $('#inputs').innerHTML = `
+    <div class="form-row"><label>Date of Birth</label><input id="age_dob" type="date" value="${tool.prefill?.dob||''}"></div>
+    <div class="top-actions"><button id="age_calc" class="btn">Calculate Age</button><button id="age_share" class="btn ghost">Share</button></div>
+    <div style="margin-top:10px" class="small">Shows years, months and days.</div>
+  `;
+  $('#result').innerHTML = `
+    <div class="result-box">
+      <div class="small">Age</div>
+      <div id="age_value" style="font-size:22px;font-weight:700;margin-top:8px">--</div>
+      <div id="age_detail" class="muted" style="margin-top:6px">--</div>
+    </div>
+  `;
+  const calc = () => {
+    const val = $('#age_dob').value;
+    if(!val){ $('#age_value').innerText='--'; $('#age_detail').innerText='Select DOB'; return; }
+    const dob = new Date(val); const now = new Date();
+    if(dob > now){ $('#age_value').innerText='--'; $('#age_detail').innerText='DOB is in the future'; return; }
+    let years = now.getFullYear() - dob.getFullYear();
+    let months = now.getMonth() - dob.getMonth();
+    let days = now.getDate() - dob.getDate();
+    if(days < 0){ months -= 1; const prevMonth = new Date(now.getFullYear(), now.getMonth(), 0); days += prevMonth.getDate(); }
+    if(months < 0){ years -= 1; months += 12; }
+    $('#age_value').innerText = years + ' yrs';
+    $('#age_detail').innerText = months + ' months, ' + days + ' days';
+    const url = new URL(location); url.searchParams.set('id','age-calculator'); url.searchParams.set('dob',val); history.replaceState(null,'',url.toString());
+  };
+  $('#age_calc').addEventListener('click', calc);
+  $('#age_share').addEventListener('click', ()=> {
+    const url = location.href;
+    navigator.clipboard?.writeText(url).then(()=> { $('#age_share').innerText = 'Copied!'; setTimeout(()=> $('#age_share').innerText = 'Share',1300); }).catch(()=> alert('Copy this link:\\n' + url));
+  });
+  // auto calc if dob param present
+  const params = new URLSearchParams(location.search);
+  if(params.get('dob')) { $('#age_dob').value = params.get('dob'); calc(); }
+}
+
+/* Loan calculator (similar to EMI but named Loan) */
+function renderLoan(tool){
+  $('#inputs').innerHTML = `
+    <div class="form-row"><label>Loan Amount (Principal)</label><input id="loan_principal" type="number" min="0" value="${tool.prefill?.P||1000000}"></div>
+    <div class="form-row"><label>Annual Interest Rate (%)</label><input id="loan_rate" type="number" min="0" step="0.01" value="${tool.prefill?.r||8}"></div>
+    <div class="form-row"><label>Tenure (Years)</label><input id="loan_years" type="number" min="0" step="1" value="${tool.prefill?.years||10}"></div>
+    <div class="top-actions"><button id="loan_calc" class="btn">Calculate</button><button id="loan_share" class="btn ghost">Share</button></div>
+    <div style="margin-top:10px" class="small">Monthly payment and totals.</div>
+  `;
+  $('#result').innerHTML = `
+    <div class="result-box">
+      <div class="small">Monthly Payment</div>
+      <div id="loan_month" style="font-size:22px;font-weight:700;margin-top:8px">--</div>
+      <div style="margin-top:8px" class="small">Total Payment: <span id="loan_total">--</span></div>
+      <div style="margin-top:6px" class="small">Total Interest: <span id="loan_interest">--</span></div>
+    </div>
+  `;
+  const calc = () => {
+    const P = parseFloat($('#loan_principal').value) || 0;
+    const annual = parseFloat($('#loan_rate').value) || 0;
+    const years = parseFloat($('#loan_years').value) || 0;
+    if(P<=0 || years<=0){ $('#loan_month').innerText='--'; $('#loan_total').innerText='--'; $('#loan_interest').innerText='--'; return; }
+    const n = years * 12;
+    const r = (annual/100)/12;
+    const pow = Math.pow(1+r, n);
+    const monthly = (P * r * pow) / (pow - 1);
+    const monthlyRounded = Math.round(monthly*100)/100;
+    const total = Math.round(monthly * n * 100)/100;
+    const interest = Math.round((total - P)*100)/100;
+    $('#loan_month').innerText = monthlyRounded.toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2});
+    $('#loan_total').innerText = total.toLocaleString(); $('#loan_interest').innerText = interest.toLocaleString();
+    const url = new URL(location); url.searchParams.set('id','loan-calculator'); url.searchParams.set('P',P); url.searchParams.set('r',annual); url.searchParams.set('years',years); history.replaceState(null,'',url.toString());
+  };
+  $('#loan_calc').addEventListener('click', calc);
+  $('#loan_share').addEventListener('click', ()=> {
+    const url = location.href;
+    navigator.clipboard?.writeText(url).then(()=> { $('#loan_share').innerText = 'Copied!'; setTimeout(()=> $('#loan_share').innerText = 'Share',1300); }).catch(()=> alert('Copy this link:\\n' + url));
+  });
+  const params = new URLSearchParams(location.search);
+  if(params.get('P') || params.get('r') || params.get('years')) calc();
+}
+
+/* Main: load header/footer, catalog, and pick tool to render */
+(async function main(){
+  await loadPartial('partials/header.html', '#header-placeholder');
+  await loadPartial('partials/footer.html', '#footer-placeholder');
+  const data = await loadCatalog().catch(()=> ({categories:[], featured:[]}));
+
+  // determine tool id from query string (id param) OR fallback to hash
+  const id = getParam('id') || location.hash.replace('#','') || '';
+  // find tool in catalog
+  let found = null;
+  let parent = null;
+  for(const c of data.categories || []){
+    const t = (c.tools || []).find(x => x.id === id);
+    if(t){ found = t; parent = c; break; }
+  }
+  // if not found, check featured extras (some featured items may not be in categories)
+  const extras = {
+    'pdf-to-word':{id:'pdf-to-word',title:'PDF to Word',desc:'Convert PDF to Word',type:'placeholder'},
+    'random-name':{id:'random-name',title:'Random Name Generator',desc:'Create names quickly',type:'random-name'}
+  };
+  if(!found && id && extras[id]) { found = extras[id]; parent = { title: 'Featured' }; }
+
+  if(!id){
+    // no tool id — show message and guide back to index
+    $('#breadcrumb').innerText = 'Home';
+    $('#toolTitle').innerText = 'No tool selected';
+    $('#toolDesc').innerText = 'Please go back to the home page and choose a tool.';
+    $('#inputs').innerHTML = '<div class="muted">Open the home page and select a tool (e.g., BMI Calculator).</div>';
+    $('#result').innerHTML = '<div class="result-box"><div class="muted">Result</div><div style="font-weight:700;margin-top:8px">--</div></div>';
+    return;
+  }
+
+  if(!found){
+    $('#breadcrumb').innerText = 'Home › Tools';
+    $('#toolTitle').innerText = 'Tool not found';
+    $('#toolDesc').innerText = 'The requested tool was not found in the catalog.';
+    $('#inputs').innerHTML = '<div class="muted">Tool ID: ' + id + ' not recognized.</div>';
+    $('#result').innerHTML = '<div class="result-box"><div class="muted">Result</div><div style="font-weight:700;margin-top:8px">--</div></div>';
+    return;
+  }
+
+  // set page title and breadcrumb
+  $('#breadcrumb').innerText = 'Home › ' + (parent?.title || 'Tools') + ' › ' + found.title;
+  $('#toolTitle').innerText = found.title;
+  $('#toolDesc').innerText = found.desc || '';
+
+  // supply prefill values from query params if present
+  const params = new URLSearchParams(location.search);
+  found.prefill = found.prefill || {};
+  if(params.get('weight')) found.prefill.weight = params.get('weight');
+  if(params.get('height')) found.prefill.height = params.get('height');
+  if(params.get('P')) found.prefill.P = params.get('P');
+  if(params.get('r')) found.prefill.r = params.get('r');
+  if(params.get('years')) found.prefill.years = params.get('years');
+  if(params.get('dob')) found.prefill.dob = params.get('dob');
+
+  // route to renderer by type (or by id fallback)
+  const type = found.type || found.id;
+  if(type === 'bmi' || found.id === 'bmi-calculator') renderBMI(found);
+  else if(type === 'emi' || found.id === 'emi-calculator') renderEMI(found);
+  else if(type === 'age' || found.id === 'age-calculator') renderAge(found);
+  else if(type === 'loan' || found.id === 'loan-calculator') renderLoan(found);
+  else renderPlaceholder(found);
+})();
+</script>
+</body>
+</html>
