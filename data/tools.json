@@ -1,0 +1,22 @@
+{
+  "categories": [
+    {
+      "id": "calculators",
+      "title": "Calculators",
+      "desc": "Quick math & finance tools.",
+      "tools": [
+        { "id": "bmi-calculator", "title": "BMI Calculator", "desc": "Quick BMI check.", "type": "bmi" },
+        { "id": "emi-calculator", "title": "EMI Calculator", "desc": "Monthly EMI calculation.", "type": "emi" }
+      ]
+    },
+    {
+      "id": "generators",
+      "title": "Generators",
+      "desc": "Create names, text, ideas.",
+      "tools": [
+        { "id": "random-name", "title": "Random Name Generator", "desc": "Create names quickly.", "type": "random-name" }
+      ]
+    }
+  ],
+  "featured": ["bmi-calculator","emi-calculator"]
+}
