@@ -3,444 +3,344 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>ToolZen Hub - Single File Demo</title>
-
-  <!-- Tailwind CDN (Play CDN) for quick styling -->
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script>
-    // Optional Tailwind config
-    tailwind.config = {
-      darkMode: 'class',
-      theme: {
-        extend: {}
-      }
-    }
-  </script>
-
-  <!-- React / ReactDOM UMD -->
-  <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
-  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
-
-  <!-- React Router DOM UMD -->
-  <script crossorigin src="https://unpkg.com/react-router-dom@6/umd/react-router-dom.development.js"></script>
-
-  <!-- Babel to allow JSX in browser (dev only - ok for demo) -->
-  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-
+  <title>ToolZen Hub - Demo (Vanilla)</title>
   <style>
-    /* small mobile tweaks for demo */
-    body { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
-    .no-underline { text-decoration: none; }
+    :root{
+      --bg:#f7f7f8; --card:#fff; --muted:#6b7280; --accent:#2563eb; --radius:12px;
+      --shadow: 0 6px 18px rgba(16,24,40,0.06);
+    }
+    html,body{height:100%; margin:0; font-family:Inter, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;}
+    body{background:var(--bg); color:#0f172a; -webkit-font-smoothing:antialiased;}
+    .container{max-width:980px; margin:0 auto; padding:16px;}
+    header{background:var(--card); border-bottom:1px solid #e6e7eb; display:flex; align-items:center; justify-content:space-between; padding:12px 16px; border-radius:8px;}
+    .brand{display:flex; gap:10px; align-items:center; cursor:pointer;}
+    .brand .logo{font-size:20px; font-weight:700;}
+    .controls{display:flex; gap:8px; align-items:center;}
+    .avatar{width:36px; height:36px; border-radius:50%; background:#c7c9cc;}
+    .hero{background:linear-gradient(90deg,#ffffff 0%, #f3f4f6 100%); padding:20px; border-radius:14px; box-shadow:var(--shadow); margin-top:16px;}
+    .hero h1{margin:0; font-size:20px;}
+    .muted{color:var(--muted); margin-top:6px;}
+    .search{margin-top:14px; display:flex;}
+    .search input{flex:1; padding:12px 14px; border-radius:999px; border:1px solid #e6e7eb; font-size:15px;}
+    .grid{display:grid; gap:12px; margin-top:16px;}
+    .cols3{grid-template-columns:repeat(3,1fr);}
+    .card{background:var(--card); padding:14px; border-radius:12px; box-shadow:var(--shadow); border:1px solid #eef2f6;}
+    .card .icon{font-size:22px;}
+    .card .title{font-weight:600; margin-top:8px;}
+    .card .desc{color:var(--muted); margin-top:6px; font-size:13px;}
+    .tool-actions{margin-top:10px; display:flex; gap:8px;}
+    .btn{padding:8px 12px; border-radius:8px; border:none; cursor:pointer; font-weight:600;}
+    .btn-primary{background:var(--accent); color:white;}
+    .btn-ghost{background:transparent; border:1px solid #e6e7eb;}
+    .page{display:none; margin-top:18px;}
+    .page.active{display:block;}
+    .topbar{display:flex; align-items:center; gap:8px; margin-bottom:12px;}
+    .back{color:var(--accent); cursor:pointer; font-weight:600;}
+    .tool-shell{background:var(--card); padding:16px; border-radius:12px; box-shadow:var(--shadow); border:1px solid #eef2f6;}
+    .form-row{margin-bottom:12px;}
+    .input{width:100%; padding:10px 12px; border-radius:8px; border:1px solid #e6e7eb; font-size:15px;}
+    .result-card{padding:12px; border-radius:10px; background:#f8fafc; border:1px solid #eef2f6;}
+    footer{margin-top:28px; padding:12px; text-align:center; color:var(--muted); font-size:13px;}
+    /* responsive */
+    @media (max-width:720px){
+      .cols3{grid-template-columns:repeat(1,1fr);}
+      header{margin-bottom:8px;}
+    }
   </style>
 </head>
-<body class="antialiased">
-  <div id="root"></div>
+<body>
+  <div class="container">
+    <!-- header -->
+    <header>
+      <div class="brand" id="brand">
+        <div style="font-size:18px">☰</div>
+        <div class="logo">ToolZen Hub</div>
+      </div>
+      <div class="controls">
+        <button class="btn btn-ghost" id="modeToggle">🌙</button>
+        <div class="avatar"></div>
+      </div>
+    </header>
 
-  <!-- App code (single-file). Uses React, ReactDOM, ReactRouterDOM from UMD -->
-  <script type="text/babel">
-    const { useState, useEffect, useMemo } = React;
-    const { createRoot } = ReactDOM;
-    const { BrowserRouter: Router, Routes, Route, Link, useNavigate, useParams } = ReactRouterDOM;
+    <!-- pages -->
+    <!-- HOME -->
+    <div id="homePage" class="page active">
+      <section class="hero">
+        <h1>All-in-One Tools Hub for Daily Productivity</h1>
+        <div class="muted">Calculators • Generators • Converters • More</div>
+        <div class="search">
+          <input id="globalSearch" placeholder="🔍 Search 200+ tools…" />
+        </div>
+      </section>
 
-    // ---------------------- Data ----------------------
+      <section style="margin-top:18px;">
+        <h3>Categories</h3>
+        <div class="grid cols3" id="categoriesGrid"></div>
+      </section>
+
+      <section style="margin-top:12px;">
+        <h3>Featured Tools</h3>
+        <div class="grid cols3" id="featuredGrid"></div>
+      </section>
+    </div>
+
+    <!-- CATEGORY -->
+    <div id="categoryPage" class="page">
+      <div class="topbar">
+        <div class="back" id="catBack">← Back</div>
+      </div>
+      <h2 id="categoryTitle"></h2>
+      <div class="muted" id="categoryDesc"></div>
+      <div class="grid cols3" id="categoryTools" style="margin-top:12px;"></div>
+    </div>
+
+    <!-- TOOL -->
+    <div id="toolPage" class="page">
+      <div class="topbar">
+        <div class="back" id="toolBack">← Back</div>
+      </div>
+      <h2 id="toolTitle"></h2>
+      <div class="muted" id="toolDesc"></div>
+
+      <div style="margin-top:12px" class="tool-shell" id="toolShell">
+        <!-- tool content injected -->
+      </div>
+    </div>
+
+    <footer>About | Privacy Policy | Terms | © ToolZen Hub</footer>
+  </div>
+
+  <script>
+    // Minimal data model (add more categories/tools here)
     const DATA = {
       categories: [
-        { id: 'calculators', title: 'Calculators', icon: '🧮', slug: 'calculators', description: 'Quick math & finance tools.' },
-        { id: 'generators', title: 'Generators', icon: '📝', slug: 'generators', description: 'Create names, text, ideas.' }
+        { id: 'calculators', title: 'Calculators', icon: '🧮', description: 'Quick math & finance tools.' },
+        { id: 'generators', title: 'Generators', icon: '📝', description: 'Create names, text, ideas.' },
+        { id: 'text', title: 'Text Tools', icon: '🔤', description: 'Edit, format, or analyze text.' }
       ],
       tools: [
-        {
-          id: 'bmi-calculator',
-          title: 'BMI Calculator',
-          slug: 'bmi-calculator',
-          categoryId: 'calculators',
-          shortDescription: 'Quick BMI check',
-          type: 'auto-form',
-          meta: {
-            inputs: [
-              { name: 'weight', label: 'Weight', type: 'number', unit: 'kg', placeholder: '60' },
-              { name: 'height', label: 'Height', type: 'number', unit: 'cm', placeholder: '170' }
-            ],
-            compute: 'bmi'
-          }
-        },
-        {
-          id: 'age-calculator',
-          title: 'Age Calculator',
-          slug: 'age-calculator',
-          categoryId: 'calculators',
-          shortDescription: 'Find exact age',
-          type: 'component',
-          componentKey: 'Age'
-        }
+        { id:'bmi-calculator', title:'BMI Calculator', slug:'bmi-calculator', categoryId:'calculators', shortDescription:'Quick BMI check', type:'bmi' },
+        { id:'age-calculator', title:'Age Calculator', slug:'age-calculator', categoryId:'calculators', shortDescription:'Find exact age', type:'age' }
       ]
     };
 
-    // ---------------------- App ----------------------
-    function App() {
-      return (
-        <Router>
-          <RootLayout>
-            <Routes>
-              <Route path="/" element={<Home />} />
-              <Route path="/category/:slug" element={<CategoryPage />} />
-              <Route path="/tool/:slug" element={<ToolPage />} />
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-          </RootLayout>
-        </Router>
-      );
+    // Page refs
+    const pages = {
+      home: document.getElementById('homePage'),
+      category: document.getElementById('categoryPage'),
+      tool: document.getElementById('toolPage')
+    };
+
+    function showPage(name){
+      Object.values(pages).forEach(p => p.classList.remove('active'));
+      pages[name].classList.add('active');
+      window.scrollTo(0,0);
     }
 
-    // ---------------------- RootLayout ----------------------
-    function RootLayout({ children }) {
-      const [menuOpen, setMenuOpen] = useState(false);
-      const [dark, setDark] = useState(() => {
-        try { return localStorage.getItem('toolzen:dark') === '1' } catch { return false }
+    // Render categories and featured
+    const categoriesGrid = document.getElementById('categoriesGrid');
+    const featuredGrid = document.getElementById('featuredGrid');
+
+    function renderCategories(){
+      categoriesGrid.innerHTML = '';
+      DATA.categories.forEach(c => {
+        const el = document.createElement('div');
+        el.className = 'card';
+        el.innerHTML = `
+          <div class="icon">${c.icon}</div>
+          <div class="title">${c.title}</div>
+          <div class="desc">${c.description}</div>
+        `;
+        el.addEventListener('click', () => openCategory(c.id));
+        categoriesGrid.appendChild(el);
       });
-
-      useEffect(() => {
-        try { localStorage.setItem('toolzen:dark', dark ? '1' : '0') } catch {}
-        document.documentElement.classList.toggle('dark', dark)
-      }, [dark]);
-
-      return (
-        <div className="min-h-screen bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 transition-colors">
-          <Header onOpenMenu={() => setMenuOpen(true)} dark={dark} setDark={setDark} />
-          <main className="max-w-5xl mx-auto px-4 py-6">
-            {children}
-          </main>
-          <Footer />
-          <SlideMenu open={menuOpen} onClose={() => setMenuOpen(false)} />
-        </div>
-      );
     }
 
-    // ---------------------- Header ----------------------
-    function Header({ onOpenMenu, dark, setDark }) {
-      return (
-        <header className="w-full border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 sticky top-0 z-40">
-          <div className="max-w-5xl mx-auto px-4 py-3 flex items-center justify-between">
-            <div className="flex items-center space-x-3">
-              <button onClick={onOpenMenu} aria-label="Open menu" className="p-2 rounded hover:bg-gray-100 dark:hover:bg-gray-700">☰</button>
-              <Link to="/" className="flex items-center gap-3 no-underline">
-                <div className="font-bold text-lg">ToolZen Hub</div>
-              </Link>
-            </div>
-
-            <div className="flex items-center gap-3">
-              <SearchBar />
-              <button onClick={() => setDark(!dark)} className="px-3 py-1 rounded-md bg-gray-100 dark:bg-gray-700" aria-label="Toggle theme">
-                {dark ? '☀️' : '🌙'}
-              </button>
-              <div className="w-8 h-8 rounded-full bg-gray-300 dark:bg-gray-600" />
-            </div>
+    function renderFeatured(){
+      featuredGrid.innerHTML = '';
+      DATA.tools.slice(0,6).forEach(t => {
+        const el = document.createElement('div');
+        el.className = 'card';
+        el.innerHTML = `
+          <div class="title">${t.title}</div>
+          <div class="desc">${t.shortDescription}</div>
+          <div class="tool-actions">
+            <button class="btn btn-primary" data-open="${t.slug}">Open</button>
+            <button class="btn btn-ghost">Preview</button>
           </div>
-        </header>
-      );
+        `;
+        el.querySelector('[data-open]').addEventListener('click', () => openTool(t.slug));
+        featuredGrid.appendChild(el);
+      });
     }
 
-    // ---------------------- SlideMenu ----------------------
-    function SlideMenu({ open, onClose }) {
-      const navigate = useNavigate();
-      function go(path) { onClose(); navigate(path) }
-      return (
-        <div className={`fixed inset-0 z-50 transform transition-all ${open ? 'visible opacity-100' : 'invisible opacity-0'}`}>
-          <div className="absolute inset-0 bg-black/40" onClick={onClose} />
-          <aside className={`fixed right-0 top-0 h-full w-full max-w-xs bg-white dark:bg-gray-800 p-4 shadow-lg transform transition-transform ${open ? 'translate-x-0' : 'translate-x-full'}`}>
-            <div className="flex items-center justify-between">
-              <div className="font-bold">Menu</div>
-              <button onClick={onClose} className="p-1">✕</button>
-            </div>
-            <nav className="mt-6 space-y-3">
-              <button className="w-full text-left" onClick={() => go('/')}>Home</button>
-              <button className="w-full text-left" onClick={() => go('/category/calculators')}>Categories</button>
-              <button className="w-full text-left">Featured Tools</button>
-              <button className="w-full text-left">Privacy Policy</button>
-              <button className="w-full text-left">Terms of Use</button>
-            </nav>
-          </aside>
-        </div>
-      );
-    }
-
-    // ---------------------- SearchBar ----------------------
-    function SearchBar() {
-      const [q, setQ] = useState('');
-      const navigate = useNavigate();
-      const results = useMemo(() => {
-        const s = q.trim().toLowerCase();
-        if (!s) return [];
-        const matches = [];
-        for (const t of DATA.tools) {
-          if ((t.title + ' ' + (t.shortDescription || '')).toLowerCase().includes(s)) matches.push(t)
-        }
-        return matches.slice(0, 6);
-      }, [q]);
-
-      return (
-        <div className="relative w-64 sm:w-80">
-          <input
-            value={q}
-            onChange={(e) => setQ(e.target.value)}
-            placeholder="Search 200+ tools…"
-            className="w-full rounded-full border px-4 py-2 focus:outline-none bg-white dark:bg-gray-800"
-            onKeyDown={(e) => {
-              if (e.key === 'Enter' && results[0]) { navigate(`/tool/${results[0].slug}`); setQ('') }
-            }}
-          />
-
-          {q && results.length > 0 && (
-            <div className="absolute left-0 right-0 mt-1 bg-white dark:bg-gray-800 rounded shadow border z-20">
-              {results.map(r => (
-                <div key={r.id} className="px-4 py-2 hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer" onClick={() => { navigate(`/tool/${r.slug}`); setQ('') }}>
-                  <div className="font-medium">{r.title}</div>
-                  <div className="text-sm text-gray-500">{r.shortDescription}</div>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-      );
-    }
-
-    // ---------------------- Home Page ----------------------
-    function Home() {
-      const categories = DATA.categories;
-      const featured = DATA.tools.slice(0, 6);
-
-      return (
-        <div className="space-y-8">
-          <Hero />
-          <section>
-            <h2 className="text-xl font-semibold mb-4">Categories</h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-              {categories.map(c => <CategoryCard key={c.id} category={c} />)}
-            </div>
-          </section>
-
-          <section>
-            <h2 className="text-xl font-semibold mb-4">Featured Tools</h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-              {featured.map(t => <ToolCard key={t.id} tool={t} />)}
-            </div>
-          </section>
-        </div>
-      );
-    }
-
-    function Hero() {
-      return (
-        <div className="rounded-lg p-6 bg-gradient-to-r from-white to-gray-50 dark:from-gray-800 dark:to-gray-800 shadow">
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-2xl font-bold">All-in-One Tools Hub for Daily Productivity</h1>
-              <p className="text-gray-600 dark:text-gray-300 mt-1">Calculators • Generators • Converters • More</p>
-            </div>
-            <div className="hidden md:block w-64 text-right text-sm text-gray-500">Fast access to 200+ tools</div>
+    // Category page
+    const categoryTitle = document.getElementById('categoryTitle');
+    const categoryDesc = document.getElementById('categoryDesc');
+    const categoryTools = document.getElementById('categoryTools');
+    function openCategory(id){
+      const cat = DATA.categories.find(c => c.id===id);
+      if(!cat) return;
+      categoryTitle.textContent = cat.title;
+      categoryDesc.textContent = cat.description;
+      categoryTools.innerHTML = '';
+      const tools = DATA.tools.filter(t => t.categoryId===id);
+      tools.forEach(t => {
+        const el = document.createElement('div');
+        el.className='card';
+        el.innerHTML = `
+          <div class="title">${t.title}</div>
+          <div class="desc">${t.shortDescription}</div>
+          <div class="tool-actions">
+            <button class="btn btn-primary" data-open="${t.slug}">Open</button>
           </div>
-          <div className="mt-6 max-w-xl">
-            <input placeholder="Search 200+ tools…" className="w-full rounded-full border px-4 py-3 focus:outline-none bg-white dark:bg-gray-800" />
-          </div>
-        </div>
-      );
+        `;
+        el.querySelector('[data-open]').addEventListener('click', ()=> openTool(t.slug));
+        categoryTools.appendChild(el);
+      });
+      showPage('category');
     }
 
-    function CategoryCard({ category }) {
-      return (
-        <Link to={`/category/${category.slug}`} className="block p-4 rounded-lg border hover:shadow no-underline bg-white dark:bg-gray-800">
-          <div className="text-3xl">{category.icon}</div>
-          <div className="font-semibold mt-2 text-lg">{category.title}</div>
-          <div className="text-sm text-gray-500 mt-1">{category.description}</div>
-        </Link>
-      );
+    // Tool page
+    const toolTitle = document.getElementById('toolTitle');
+    const toolDesc = document.getElementById('toolDesc');
+    const toolShell = document.getElementById('toolShell');
+
+    function openTool(slug){
+      const tool = DATA.tools.find(t => t.slug===slug);
+      if(!tool) return;
+      toolTitle.textContent = tool.title;
+      toolDesc.textContent = tool.shortDescription;
+      toolShell.innerHTML = '';
+      if(tool.type === 'bmi'){
+        renderBmi(toolShell);
+      } else if(tool.type === 'age'){
+        renderAge(toolShell);
+      } else {
+        toolShell.textContent = 'Tool not supported yet.';
+      }
+      showPage('tool');
     }
 
-    function ToolCard({ tool }) {
-      return (
-        <div className="p-4 rounded-lg border hover:shadow flex flex-col justify-between bg-white dark:bg-gray-800">
+    // Simple BMI tool
+    function renderBmi(container){
+      container.innerHTML = `
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
           <div>
-            <div className="font-semibold">{tool.title}</div>
-            <div className="text-sm text-gray-500 mt-1">{tool.shortDescription}</div>
+            <div class="form-row"><label>Weight (kg)</label><input class="input" id="bmiWeight" value="60" /></div>
+            <div class="form-row"><label>Height (cm)</label><input class="input" id="bmiHeight" value="170" /></div>
+            <div><button class="btn btn-primary" id="bmiCalc">Calculate</button></div>
           </div>
-          <div className="mt-4 flex gap-2">
-            <Link to={`/tool/${tool.slug}`} className="px-3 py-1 rounded bg-blue-600 text-white">Open</Link>
-            <button className="px-3 py-1 rounded border">Preview</button>
-          </div>
-        </div>
-      );
-    }
-
-    // ---------------------- Category Page ----------------------
-    function CategoryPage() {
-      const { slug } = useParams();
-      const navigate = useNavigate();
-      const category = DATA.categories.find(c => c.slug === slug);
-      const tools = DATA.tools.filter(t => t.categoryId === category?.id);
-
-      if (!category) return <NotFound />;
-
-      return (
-        <div>
-          <div className="mb-4">
-            <button onClick={() => navigate(-1)} className="text-sm text-blue-600">← Back</button>
-            <h2 className="text-2xl font-bold mt-2">{category.title}</h2>
-            <div className="text-sm text-gray-500">{category.description}</div>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-            {tools.map(t => <ToolCard key={t.id} tool={t} />)}
-          </div>
-        </div>
-      );
-    }
-
-    // ---------------------- Tool Page ----------------------
-    function ToolPage() {
-      const { slug } = useParams();
-      const navigate = useNavigate();
-      const tool = DATA.tools.find(t => t.slug === slug);
-
-      if (!tool) return <NotFound />;
-
-      return (
-        <div>
-          <div className="mb-4 flex items-center justify-between">
-            <div>
-              <button onClick={() => navigate(-1)} className="text-sm text-blue-600">← Back</button>
-              <h2 className="text-2xl font-bold mt-2">{tool.title}</h2>
-              <div className="text-sm text-gray-500">{tool.shortDescription}</div>
+          <div>
+            <div class="result-card">
+              <div style="color:var(--muted)">Your BMI</div>
+              <div id="bmiResult" style="font-size:28px; font-weight:700; margin-top:6px;">—</div>
+              <div id="bmiCat" style="margin-top:8px; color:var(--muted)"></div>
             </div>
-            <div className="text-sm text-gray-400">Share ⤴</div>
-          </div>
-
-          <div className="p-6 bg-white dark:bg-gray-800 rounded border">
-            {tool.type === 'component' && <LazyTool componentKey={tool.componentKey} />}
-            {tool.type === 'auto-form' && <AutoFormTool meta={tool.meta} />}
-            {!['component', 'auto-form'].includes(tool.type) && <div>Tool type not supported yet.</div>}
           </div>
         </div>
-      );
-    }
-
-    // ---------------------- LazyTool (placeholder) ----------------------
-    function LazyTool({ componentKey }) {
-      if (componentKey === 'Age') return <AgeCalculator />;
-      return <div>Tool component "{componentKey}" not found.</div>;
-    }
-
-    // ---------------------- AutoFormTool (BMI) ----------------------
-    function AutoFormTool({ meta }) {
-      const initialState = {};
-      for (const inp of meta.inputs) initialState[inp.name] = '';
-      const [form, setForm] = useState(initialState);
-
-      const values = form;
-      const result = useMemo(() => {
-        if (meta.compute === 'bmi') {
-          const w = parseFloat(values.weight || 0);
-          const h = (parseFloat(values.height || 0) || 0) / 100;
-          if (!w || !h) return null;
-          const bmi = w / (h * h);
-          let cat = '—';
-          if (bmi > 0) {
-            if (bmi < 18.5) cat = 'Underweight';
-            else if (bmi < 25) cat = 'Normal';
-            else if (bmi < 30) cat = 'Overweight';
-            else cat = 'Obese';
-          }
-          return { bmi, category: cat };
+      `;
+      const w = container.querySelector('#bmiWeight');
+      const h = container.querySelector('#bmiHeight');
+      const btn = container.querySelector('#bmiCalc');
+      const out = container.querySelector('#bmiResult');
+      const cat = container.querySelector('#bmiCat');
+      function compute(){
+        const W = parseFloat(w.value)||0;
+        const H = (parseFloat(h.value)||0)/100;
+        if(!W||!H){ out.textContent='—'; cat.textContent=''; return; }
+        const bmi = W/(H*H);
+        out.textContent = bmi.toFixed(1);
+        let c='—';
+        if(bmi>0){
+          if(bmi<18.5) c='Underweight';
+          else if(bmi<25) c='Normal';
+          else if(bmi<30) c='Overweight';
+          else c='Obese';
         }
-        return null;
-      }, [values, meta]);
-
-      return (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="space-y-4">
-            {meta.inputs.map(inp => (
-              <label key={inp.name} className="block">
-                <div className="text-sm font-medium">{inp.label} {inp.unit ? <span className="text-xs text-gray-500">({inp.unit})</span> : null}</div>
-                <input
-                  type={inp.type}
-                  placeholder={inp.placeholder}
-                  value={form[inp.name]}
-                  onChange={(e) => setForm(prev => ({ ...prev, [inp.name]: e.target.value }))}
-                  className="mt-1 w-full rounded border px-3 py-2 bg-white dark:bg-gray-800"
-                />
-              </label>
-            ))}
-            <div>
-              <button onClick={() => {}} className="px-4 py-2 rounded bg-blue-600 text-white">Calculate</button>
-            </div>
-          </div>
-
-          <div className="p-4 rounded border bg-gray-50 dark:bg-gray-900">
-            <div className="text-sm text-gray-500">Your Result</div>
-            <div className="text-3xl font-bold mt-2">{result ? result.bmi.toFixed(1) : '—'}</div>
-            <div className="text-md mt-1">{result ? result.category : ''}</div>
-          </div>
-        </div>
-      );
+        cat.textContent = c;
+      }
+      btn.addEventListener('click', compute);
+      // live update
+      w.addEventListener('input', compute);
+      h.addEventListener('input', compute);
+      compute();
     }
 
-    // ---------------------- Age Calculator ----------------------
-    function AgeCalculator() {
-      const [dob, setDob] = useState('');
-      const [age, setAge] = useState(null);
-
-      useEffect(() => {
-        if (!dob) return setAge(null);
-        const d = new Date(dob);
-        if (isNaN(d)) return setAge(null);
+    // Simple Age tool
+    function renderAge(container){
+      container.innerHTML = `
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+          <div>
+            <div class="form-row"><label>Date of Birth</label><input type="date" class="input" id="ageDob" /></div>
+          </div>
+          <div>
+            <div class="result-card">
+              <div style="color:var(--muted)">Your Age</div>
+              <div id="ageResult" style="font-size:28px; font-weight:700; margin-top:6px;">—</div>
+            </div>
+          </div>
+        </div>
+      `;
+      const dob = container.querySelector('#ageDob');
+      const out = container.querySelector('#ageResult');
+      function compute(){
+        if(!dob.value){ out.textContent='—'; return; }
+        const d = new Date(dob.value);
+        if(isNaN(d)){ out.textContent='—'; return; }
         const diff = Date.now() - d.getTime();
         const y = new Date(diff).getUTCFullYear() - 1970;
-        setAge(y);
-      }, [dob]);
-
-      return (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div>
-            <label className="block">
-              <div className="text-sm font-medium">Date of Birth</div>
-              <input type="date" value={dob} onChange={e => setDob(e.target.value)} className="mt-1 w-full rounded border px-3 py-2 bg-white dark:bg-gray-800" />
-            </label>
-          </div>
-
-          <div className="p-4 rounded border bg-gray-50 dark:bg-gray-900">
-            <div className="text-sm text-gray-500">Your Age</div>
-            <div className="text-3xl font-bold mt-2">{age !== null ? `${age} yrs` : '—'}</div>
-          </div>
-        </div>
-      );
+        out.textContent = y + ' yrs';
+      }
+      dob.addEventListener('change', compute);
     }
 
-    // ---------------------- Footer & NotFound ----------------------
-    function Footer() {
-      return (
-        <footer className="mt-12 border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
-          <div className="max-w-5xl mx-auto px-4 py-6 text-sm text-gray-500 flex justify-between">
-            <div>About | Privacy Policy | Terms</div>
-            <div>© ToolZen Hub</div>
-          </div>
-        </footer>
-      );
-    }
+    // Navigation handlers
+    document.getElementById('catBack').addEventListener('click', ()=> showPage('home'));
+    document.getElementById('toolBack').addEventListener('click', ()=> {
+      // go back to category if we can find it, else home
+      showPage('home');
+    });
+    document.getElementById('brand').addEventListener('click', ()=> showPage('home'));
 
-    function NotFound() {
-      return (
-        <div className="text-center py-20">
-          <h2 className="text-2xl font-bold">Page not found</h2>
-          <p className="text-gray-500 mt-2">We couldn't find what you're looking for.</p>
-          <div className="mt-6">
-            <Link to="/" className="px-4 py-2 rounded bg-blue-600 text-white">Back to home</Link>
-          </div>
-        </div>
-      );
-    }
+    // Search (very simple)
+    const searchInput = document.getElementById('globalSearch');
+    searchInput.addEventListener('keydown', function(e){
+      if(e.key === 'Enter'){
+        const q = searchInput.value.trim().toLowerCase();
+        if(!q) return;
+        const found = DATA.tools.find(t => t.title.toLowerCase().includes(q) || (t.shortDescription||'').toLowerCase().includes(q));
+        if(found) openTool(found.slug);
+      }
+    });
 
-    // ---------------------- Mount ----------------------
-    const root = createRoot(document.getElementById('root'));
-    root.render(<App />);
+    // Mode toggle (light/dark)
+    const modeBtn = document.getElementById('modeToggle');
+    modeBtn.addEventListener('click', ()=>{
+      if(document.documentElement.style.getPropertyValue('--bg') === '#f7f7f8'){
+        // switch dark
+        document.documentElement.style.setProperty('--bg','#0b1220');
+        document.documentElement.style.setProperty('--card','#0f1724');
+        document.documentElement.style.setProperty('--muted','#9ca3af');
+        document.documentElement.style.setProperty('--accent','#60a5fa');
+        document.documentElement.style.setProperty('--shadow','none');
+        modeBtn.textContent = '☀️';
+        document.body.style.background = '#071127';
+      } else {
+        // light
+        document.documentElement.style.setProperty('--bg','#f7f7f8');
+        document.documentElement.style.setProperty('--card','#fff');
+        document.documentElement.style.setProperty('--muted','#6b7280');
+        document.documentElement.style.setProperty('--accent','#2563eb');
+        document.documentElement.style.setProperty('--shadow','0 6px 18px rgba(16,24,40,0.06)');
+        modeBtn.textContent = '🌙';
+        document.body.style.background = '';
+      }
+    });
+
+    // initial render
+    renderCategories();
+    renderFeatured();
   </script>
 </body>
 </html>
