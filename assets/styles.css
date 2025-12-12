@@ -1,0 +1,137 @@
+:root {
+  --green: #2E7D32;
+  --accent: #4CAF50;
+  --light-green: #E8F5E9;
+  --white: #ffffff;
+  --border: #E6E6E6;
+  --muted: #666666;
+  --bg: #ffffff;
+}
+
+/* Global reset */
+* {
+  box-sizing: border-box;
+  font-family: Inter, system-ui, Arial;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background: var(--bg);
+  color: #111;
+  -webkit-font-smoothing: antialiased;
+}
+
+.container {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+/* Header */
+#site-header {
+  background: var(--white);
+  border-bottom: 1px solid var(--border);
+  padding: 14px 20px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+#site-header .brand {
+  font-weight: 700;
+  color: var(--green);
+  cursor: pointer;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+#site-header .brand .dot {
+  width: 10px;
+  height: 10px;
+  background: var(--accent);
+  border-radius: 3px;
+}
+
+/* Footer */
+#site-footer {
+  border-top: 1px solid var(--border);
+  padding: 18px;
+  display: flex;
+  justify-content: space-between;
+  color: var(--muted);
+  background: var(--white);
+}
+
+/* Cards */
+.card {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 14px;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(46, 125, 50, 0.05);
+}
+
+.card:hover {
+  transform: translateY(-3px);
+  transition: 0.2s;
+}
+
+/* Buttons */
+.btn {
+  background: var(--accent);
+  color: var(--white);
+  padding: 10px 14px;
+  border-radius: 999px;
+  border: 0;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.btn.ghost {
+  background: var(--white);
+  color: var(--accent);
+  border: 1px solid var(--accent);
+}
+
+/* Tool Result Box */
+.result-box {
+  background: var(--light-green);
+  padding: 14px;
+  border-radius: 10px;
+  border: 1px solid rgba(46, 125, 50, 0.15);
+}
+
+/* Section titles */
+h1, h2, h3 {
+  color: var(--green);
+}
+
+/* Inputs */
+input[type="number"], input[type="date"] {
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+}
+
+/* Grid */
+.grid {
+  display: grid;
+  gap: 16px;
+}
+
+.grid.cols-3 {
+  grid-template-columns: repeat(3, 1fr);
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+  .grid.cols-3 {
+    grid-template-columns: 1fr;
+  }
+  #site-header {
+    padding: 12px 14px;
+  }
+}
