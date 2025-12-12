@@ -1,346 +1,474 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>ToolZen Hub - Demo (Vanilla)</title>
-  <style>
-    :root{
-      --bg:#f7f7f8; --card:#fff; --muted:#6b7280; --accent:#2563eb; --radius:12px;
-      --shadow: 0 6px 18px rgba(16,24,40,0.06);
-    }
-    html,body{height:100%; margin:0; font-family:Inter, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;}
-    body{background:var(--bg); color:#0f172a; -webkit-font-smoothing:antialiased;}
-    .container{max-width:980px; margin:0 auto; padding:16px;}
-    header{background:var(--card); border-bottom:1px solid #e6e7eb; display:flex; align-items:center; justify-content:space-between; padding:12px 16px; border-radius:8px;}
-    .brand{display:flex; gap:10px; align-items:center; cursor:pointer;}
-    .brand .logo{font-size:20px; font-weight:700;}
-    .controls{display:flex; gap:8px; align-items:center;}
-    .avatar{width:36px; height:36px; border-radius:50%; background:#c7c9cc;}
-    .hero{background:linear-gradient(90deg,#ffffff 0%, #f3f4f6 100%); padding:20px; border-radius:14px; box-shadow:var(--shadow); margin-top:16px;}
-    .hero h1{margin:0; font-size:20px;}
-    .muted{color:var(--muted); margin-top:6px;}
-    .search{margin-top:14px; display:flex;}
-    .search input{flex:1; padding:12px 14px; border-radius:999px; border:1px solid #e6e7eb; font-size:15px;}
-    .grid{display:grid; gap:12px; margin-top:16px;}
-    .cols3{grid-template-columns:repeat(3,1fr);}
-    .card{background:var(--card); padding:14px; border-radius:12px; box-shadow:var(--shadow); border:1px solid #eef2f6;}
-    .card .icon{font-size:22px;}
-    .card .title{font-weight:600; margin-top:8px;}
-    .card .desc{color:var(--muted); margin-top:6px; font-size:13px;}
-    .tool-actions{margin-top:10px; display:flex; gap:8px;}
-    .btn{padding:8px 12px; border-radius:8px; border:none; cursor:pointer; font-weight:600;}
-    .btn-primary{background:var(--accent); color:white;}
-    .btn-ghost{background:transparent; border:1px solid #e6e7eb;}
-    .page{display:none; margin-top:18px;}
-    .page.active{display:block;}
-    .topbar{display:flex; align-items:center; gap:8px; margin-bottom:12px;}
-    .back{color:var(--accent); cursor:pointer; font-weight:600;}
-    .tool-shell{background:var(--card); padding:16px; border-radius:12px; box-shadow:var(--shadow); border:1px solid #eef2f6;}
-    .form-row{margin-bottom:12px;}
-    .input{width:100%; padding:10px 12px; border-radius:8px; border:1px solid #e6e7eb; font-size:15px;}
-    .result-card{padding:12px; border-radius:10px; background:#f8fafc; border:1px solid #eef2f6;}
-    footer{margin-top:28px; padding:12px; text-align:center; color:var(--muted); font-size:13px;}
-    /* responsive */
-    @media (max-width:720px){
-      .cols3{grid-template-columns:repeat(1,1fr);}
-      header{margin-bottom:8px;}
-    }
-  </style>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>ToolZen Hub — Single Page</title>
+<style>
+  :root{
+    --green-700:#2E7D32;
+    --green-600:#4CAF50;
+    --green-100:#E8F5E9;
+    --bg:#ffffff;
+    --muted:#666666;
+    --border:#E6E6E6;
+    --card-shadow: 0 6px 18px rgba(46,125,50,0.06);
+    --radius:12px;
+    --max-width:1100px;
+    --gap:20px;
+    --header-h:68px;
+  }
+  *{box-sizing:border-box;font-family:Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;}
+  html,body{height:100%;background:var(--bg);color:#222;margin:0;}
+  a{color:inherit;text-decoration:none}
+  .container{max-width:var(--max-width);margin:0 auto;padding:28px;}
+  /* Header */
+  header{
+    position:sticky;top:0;z-index:70;background:rgba(255,255,255,0.98);
+    backdrop-filter: blur(6px);border-bottom:1px solid var(--border);
+    height:var(--header-h);display:flex;align-items:center;
+  }
+  .header-inner{max-width:var(--max-width);margin:0 auto;padding:0 24px;display:flex;align-items:center;gap:12px;}
+  .hamburger{width:44px;height:44px;border-radius:10px;display:flex;align-items:center;justify-content:center;cursor:pointer;border:1px solid transparent}
+  .hamburger:focus{outline:3px solid rgba(76,175,80,0.15)}
+  .brand{font-weight:700;color:var(--green-700);font-size:18px;display:flex;align-items:center;gap:10px}
+  .brand .dot{width:10px;height:10px;border-radius:3px;background:var(--green-600);box-shadow:0 0 0 4px rgba(76,175,80,0.07)}
+  .spacer{flex:1}
+  .profile{display:flex;align-items:center;gap:10px}
+  .avatar{width:40px;height:40px;border-radius:8px;background:linear-gradient(135deg,var(--green-100),#fff);display:flex;align-items:center;justify-content:center;border:1px solid var(--border);font-weight:600;color:var(--green-700)}
+  /* Hero */
+  .hero{padding:44px 24px;border-radius:14px;background:linear-gradient(180deg, rgba(232,245,233,0.6), rgba(255,255,255,0.6));margin:24px 0;box-shadow:var(--card-shadow)}
+  .hero h1{margin:0;font-size:26px;color:var(--green-700);}
+  .hero p{margin:8px 0 18px;color:var(--muted)}
+  /* Search */
+  .search-wrap{display:flex;align-items:center;gap:12px;max-width:900px;}
+  .search{
+    flex:1;background:#fff;border-radius:999px;padding:12px 16px;border:1px solid var(--border);display:flex;align-items:center;gap:12px;box-shadow:0 1px 0 rgba(0,0,0,0.02)
+  }
+  .search input{border:0;outline:none;font-size:16px;width:100%;background:transparent}
+  .search .icon{font-size:18px;color:var(--green-700)}
+  /* Categories grid */
+  .section-title{display:flex;align-items:center;justify-content:space-between;margin:26px 0 12px}
+  .grid{display:grid;gap:var(--gap)}
+  .grid.cols-3{grid-template-columns:repeat(3,1fr)}
+  .card{
+    background:#fff;padding:16px;border-radius:12px;border:1px solid var(--border);
+    display:flex;flex-direction:column;gap:10px;align-items:flex-start;cursor:pointer;box-shadow:var(--card-shadow);transition:transform .16s,box-shadow .16s;
+  }
+  .card:hover{transform:translateY(-6px);box-shadow:0 14px 36px rgba(46,125,50,0.08)}
+  .card .icon{width:44px;height:44px;border-radius:10px;display:flex;align-items:center;justify-content:center;background:var(--green-100);color:var(--green-700);font-weight:700}
+  .card small{color:var(--muted)}
+  /* Featured tools */
+  .tools-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px}
+  .tool-card{display:flex;gap:12px;align-items:center;padding:16px;border-radius:10px;border:1px solid var(--border);background:#fff;cursor:pointer}
+  .tool-card .logo{width:56px;height:48px;border-radius:8px;background:var(--green-100);display:flex;align-items:center;justify-content:center;color:var(--green-700);font-weight:700}
+  .tool-card h4{margin:0}
+  .tool-card p{margin:2px 0 0;color:var(--muted);font-size:13px}
+  /* Footer */
+  footer{border-top:1px solid var(--border);padding:20px;margin-top:30px;background:transparent}
+  footer .fwrap{max-width:var(--max-width);margin:0 auto;padding:0 24px;display:flex;align-items:center;justify-content:space-between;color:var(--muted)}
+  /* Drawer */
+  .drawer-backdrop{position:fixed;inset:0;background:rgba(0,0,0,0.28);opacity:0;visibility:hidden;transition:opacity .18s;z-index:80}
+  .drawer{position:fixed;right:0;top:0;height:100%;width:320px;background:#fff;border-left:1px solid var(--border);transform:translateX(120%);transition:transform .22s;z-index:90;padding:20px;display:flex;flex-direction:column;gap:12px}
+  .drawer.open{transform:translateX(0)}
+  .drawer-backdrop.open{opacity:1;visibility:visible}
+  .drawer .close{align-self:flex-end;padding:6px;border-radius:8px;cursor:pointer}
+  .drawer a{display:block;padding:10px 8px;border-radius:8px;color:var(--green-700)}
+  /* Tool page modal-like area */
+  .tool-view{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%) scale(0.98);width:min(720px,94%);background:#fff;border-radius:14px;padding:20px;border:1px solid var(--border);box-shadow:0 28px 80px rgba(46,125,50,0.12);z-index:120;visibility:hidden;opacity:0;transition:opacity .16s,transform .16s}
+  .tool-view.open{visibility:visible;opacity:1;transform:translate(-50%,-50%) scale(1)}
+  .tool-view header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+  .tool-body{display:grid;grid-template-columns:1fr 260px;gap:16px}
+  .form-row{display:flex;flex-direction:column;gap:6px}
+  .form-row input{padding:10px;border-radius:8px;border:1px solid var(--border);font-size:15px}
+  .btn{display:inline-flex;align-items:center;gap:8px;padding:10px 14px;border-radius:999px;border:0;background:var(--green-600);color:#fff;cursor:pointer;font-weight:600}
+  .btn.ghost{background:#fff;border:1px solid var(--green-600);color:var(--green-600)}
+  .result-box{background:var(--green-100);padding:14px;border-radius:10px;border:1px solid rgba(76,175,80,0.08)}
+  /* Breadcrumbs */
+  .breadcrumbs{font-size:13px;color:var(--muted);margin:10px 0}
+  /* Responsive */
+  @media (max-width:980px){
+    .tools-grid{grid-template-columns:1fr}
+    .card{min-height:88px}
+    .grid.cols-3{grid-template-columns:repeat(2,1fr)}
+    .tool-body{grid-template-columns:1fr}
+  }
+  @media (max-width:640px){
+    .grid.cols-3{grid-template-columns:1fr}
+    header .header-inner{padding:0 12px}
+    .hero{padding:18px}
+  }
+</style>
 </head>
 <body>
-  <div class="container">
-    <!-- header -->
-    <header>
-      <div class="brand" id="brand">
-        <div style="font-size:18px">☰</div>
-        <div class="logo">ToolZen Hub</div>
-      </div>
-      <div class="controls">
-        <button class="btn btn-ghost" id="modeToggle">🌙</button>
-        <div class="avatar"></div>
-      </div>
-    </header>
 
-    <!-- pages -->
-    <!-- HOME -->
-    <div id="homePage" class="page active">
-      <section class="hero">
-        <h1>All-in-One Tools Hub for Daily Productivity</h1>
-        <div class="muted">Calculators • Generators • Converters • More</div>
-        <div class="search">
-          <input id="globalSearch" placeholder="🔍 Search 200+ tools…" />
-        </div>
-      </section>
-
-      <section style="margin-top:18px;">
-        <h3>Categories</h3>
-        <div class="grid cols3" id="categoriesGrid"></div>
-      </section>
-
-      <section style="margin-top:12px;">
-        <h3>Featured Tools</h3>
-        <div class="grid cols3" id="featuredGrid"></div>
-      </section>
+<header aria-label="Global header">
+  <div class="header-inner">
+    <button class="hamburger" id="hamburger" aria-label="Open menu" aria-expanded="false">☰</button>
+    <div class="brand" aria-hidden="false">
+      <div class="dot" aria-hidden="true"></div>
+      <div>ToolZen Hub</div>
     </div>
 
-    <!-- CATEGORY -->
-    <div id="categoryPage" class="page">
-      <div class="topbar">
-        <div class="back" id="catBack">← Back</div>
-      </div>
-      <h2 id="categoryTitle"></h2>
-      <div class="muted" id="categoryDesc"></div>
-      <div class="grid cols3" id="categoryTools" style="margin-top:12px;"></div>
-    </div>
+    <div class="spacer"></div>
 
-    <!-- TOOL -->
-    <div id="toolPage" class="page">
-      <div class="topbar">
-        <div class="back" id="toolBack">← Back</div>
-      </div>
-      <h2 id="toolTitle"></h2>
-      <div class="muted" id="toolDesc"></div>
-
-      <div style="margin-top:12px" class="tool-shell" id="toolShell">
-        <!-- tool content injected -->
+    <div class="profile" aria-hidden="false">
+      <div style="text-align:right">
+        <div style="font-size:12px;color:var(--muted)">Profile</div>
+        <div class="avatar" title="User">A</div>
       </div>
     </div>
+  </div>
+</header>
 
-    <footer>About | Privacy Policy | Terms | © ToolZen Hub</footer>
+<main class="container" id="main">
+  <!-- Hero / Banner -->
+  <section class="hero" role="region" aria-labelledby="hero-title">
+    <h1 id="hero-title">All-in-One Tools Hub for Daily Productivity</h1>
+    <p>Calculators • Generators • Converters • More</p>
+
+    <div class="search-wrap" style="margin-top:6px">
+      <div class="search" role="search" aria-label="Search tools">
+        <div class="icon" aria-hidden="true">🔍</div>
+        <input id="searchInput" placeholder="Search 200+ tools…" aria-label="Search 200+ tools" autocomplete="off">
+      </div>
+      <button class="btn" id="searchCTA" aria-label="Search">Search</button>
+    </div>
+
+    <div id="searchSuggestions" style="margin-top:10px;color:var(--muted);font-size:13px;display:none"></div>
+  </section>
+
+  <!-- Categories -->
+  <div style="display:flex;align-items:center;justify-content:space-between;">
+    <h3 style="margin:0">Categories</h3>
+    <small style="color:var(--muted)">3-column layout on desktop</small>
   </div>
 
-  <script>
-    // Minimal data model (add more categories/tools here)
-    const DATA = {
-      categories: [
-        { id: 'calculators', title: 'Calculators', icon: '🧮', description: 'Quick math & finance tools.' },
-        { id: 'generators', title: 'Generators', icon: '📝', description: 'Create names, text, ideas.' },
-        { id: 'text', title: 'Text Tools', icon: '🔤', description: 'Edit, format, or analyze text.' }
-      ],
-      tools: [
-        { id:'bmi-calculator', title:'BMI Calculator', slug:'bmi-calculator', categoryId:'calculators', shortDescription:'Quick BMI check', type:'bmi' },
-        { id:'age-calculator', title:'Age Calculator', slug:'age-calculator', categoryId:'calculators', shortDescription:'Find exact age', type:'age' }
-      ]
-    };
+  <section class="grid cols-3" id="categories" style="margin-top:12px">
+    <div class="card" data-slug="calculators" tabindex="0" role="button" aria-pressed="false">
+      <div class="icon">🧮</div>
+      <div>
+        <strong>Calculators</strong>
+        <div style="height:4px"></div>
+        <small>Quick math & finance tools.</small>
+      </div>
+    </div>
 
-    // Page refs
-    const pages = {
-      home: document.getElementById('homePage'),
-      category: document.getElementById('categoryPage'),
-      tool: document.getElementById('toolPage')
-    };
+    <div class="card" data-slug="generators" tabindex="0" role="button" aria-pressed="false">
+      <div class="icon">📝</div>
+      <div>
+        <strong>Generators</strong>
+        <div style="height:4px"></div>
+        <small>Create names, text, ideas.</small>
+      </div>
+    </div>
 
-    function showPage(name){
-      Object.values(pages).forEach(p => p.classList.remove('active'));
-      pages[name].classList.add('active');
-      window.scrollTo(0,0);
+    <div class="card" data-slug="text-tools" tabindex="0" role="button" aria-pressed="false">
+      <div class="icon">🔤</div>
+      <div>
+        <strong>Text Tools</strong>
+        <div style="height:4px"></div>
+        <small>Edit, format, or analyze.</small>
+      </div>
+    </div>
+
+    <div class="card" data-slug="web-tools" tabindex="0" role="button" aria-pressed="false">
+      <div class="icon">🌐</div>
+      <div>
+        <strong>Web Tools</strong>
+        <div style="height:4px"></div>
+        <small>Online utilities.</small>
+      </div>
+    </div>
+
+    <div class="card" data-slug="converters" tabindex="0" role="button" aria-pressed="false">
+      <div class="icon">🔁</div>
+      <div>
+        <strong>Converters</strong>
+        <div style="height:4px"></div>
+        <small>Change formats instantly.</small>
+      </div>
+    </div>
+
+    <div class="card" data-slug="misc" tabindex="0" role="button" aria-pressed="false">
+      <div class="icon">⚙️</div>
+      <div>
+        <strong>Misc Tools</strong>
+        <div style="height:4px"></div>
+        <small>Helpful extras.</small>
+      </div>
+    </div>
+  </section>
+
+  <!-- Featured -->
+  <div class="section-title" style="margin-top:28px">
+    <h3 style="margin:0">Featured Tools</h3>
+    <small style="color:var(--muted)">Quick access</small>
+  </div>
+
+  <section class="tools-grid" style="margin-bottom:20px">
+    <div class="tool-card" data-tool="bmi-calculator" tabindex="0" role="button">
+      <div class="logo">⭐</div>
+      <div>
+        <h4>BMI Calculator</h4>
+        <p>Quick BMI check.</p>
+      </div>
+    </div>
+
+    <div class="tool-card" data-tool="pdf-to-word" tabindex="0" role="button">
+      <div class="logo">🔥</div>
+      <div>
+        <h4>PDF to Word</h4>
+        <p>Convert instantly.</p>
+      </div>
+    </div>
+
+    <div class="tool-card" data-tool="age-calculator" tabindex="0" role="button">
+      <div class="logo">🕑</div>
+      <div>
+        <h4>Age Calculator</h4>
+        <p>Find age precisely.</p>
+      </div>
+    </div>
+
+    <div class="tool-card" data-tool="random-name" tabindex="0" role="button">
+      <div class="logo">🎲</div>
+      <div>
+        <h4>Random Name Generator</h4>
+        <p>Create names quickly.</p>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="fwrap">
+      <div>About | Privacy Policy | Terms of Use</div>
+      <div style="color:var(--muted)">Copyright © ToolZen Hub</div>
+    </div>
+  </footer>
+</main>
+
+<!-- Drawer (right-side) -->
+<div id="drawerBackdrop" class="drawer-backdrop" tabindex="-1" aria-hidden="true"></div>
+<aside id="drawer" class="drawer" aria-hidden="true" role="dialog" aria-label="Main menu">
+  <button class="close" id="drawerClose" aria-label="Close menu">✕</button>
+  <nav>
+    <a href="#" data-nav="home">Home</a>
+    <a href="#" data-nav="about">About</a>
+    <a href="#" data-nav="categories">Categories</a>
+    <a href="#" data-nav="featured">Featured Tools</a>
+    <a href="#" data-nav="privacy">Privacy Policy</a>
+    <a href="#" data-nav="terms">Terms of Use</a>
+    <a href="#" data-nav="copyright">Copyright</a>
+  </nav>
+</aside>
+
+<!-- Tool View (modal-like) -->
+<section id="toolView" class="tool-view" role="dialog" aria-modal="true" aria-hidden="true">
+  <header>
+    <div>
+      <div style="font-size:13px;color:var(--muted)" id="toolBreadcrumb">Home > Calculators > BMI Calculator</div>
+      <h2 id="toolTitle" style="margin:6px 0 0">BMI Calculator</h2>
+      <div style="color:var(--muted);font-size:13px;margin-top:6px">Short description: Quickly calculate your Body Mass Index.</div>
+    </div>
+    <div style="display:flex;gap:8px;align-items:center">
+      <button id="toolClose" class="btn btn-ghost" style="background:#fff;border:0;color:var(--muted)">Close</button>
+    </div>
+  </header>
+
+  <div class="tool-body">
+    <div>
+      <div class="form-row">
+        <label>Weight (kg)</label>
+        <input type="number" id="weight" min="1" value="60" aria-label="Weight in kilograms">
+      </div>
+      <div class="form-row" style="margin-top:10px">
+        <label>Height (cm)</label>
+        <input type="number" id="height" min="50" value="170" aria-label="Height in centimeters">
+      </div>
+
+      <div style="margin-top:14px;display:flex;gap:10px">
+        <button id="calcBtn" class="btn">Calculate BMI</button>
+        <button id="shareBtn" class="btn ghost">Share</button>
+      </div>
+
+      <div style="margin-top:14px">
+        <small style="color:var(--muted)">Results will appear to the right. Inputs get encoded in shareable URL.</small>
+      </div>
+    </div>
+
+    <aside>
+      <div class="result-box" id="resultBox">
+        <div style="font-size:13px;color:var(--muted)">Result:</div>
+        <div style="font-size:28px;font-weight:700;margin-top:8px" id="bmiValue">20.8</div>
+        <div style="margin-top:6px;color:var(--green-700)" id="bmiText">Normal</div>
+      </div>
+    </aside>
+  </div>
+</section>
+
+<script>
+  // Basic DOM helpers
+  const q = s => document.querySelector(s);
+  const qa = s => Array.from(document.querySelectorAll(s));
+
+  // Drawer logic
+  const hamburger = q('#hamburger');
+  const drawer = q('#drawer');
+  const backdrop = q('#drawerBackdrop');
+  const drawerClose = q('#drawerClose');
+
+  function openDrawer(){
+    drawer.classList.add('open');
+    backdrop.classList.add('open');
+    drawer.setAttribute('aria-hidden','false');
+    backdrop.setAttribute('aria-hidden','false');
+    hamburger.setAttribute('aria-expanded','true');
+    // focus trap start
+    drawerClose.focus();
+  }
+  function closeDrawer(){
+    drawer.classList.remove('open');
+    backdrop.classList.remove('open');
+    drawer.setAttribute('aria-hidden','true');
+    backdrop.setAttribute('aria-hidden','true');
+    hamburger.setAttribute('aria-expanded','false');
+    hamburger.focus();
+  }
+  hamburger.addEventListener('click', openDrawer);
+  drawerClose.addEventListener('click', closeDrawer);
+  backdrop.addEventListener('click', closeDrawer);
+  document.addEventListener('keydown', e => {
+    if(e.key === 'Escape'){
+      if(drawer.classList.contains('open')) closeDrawer();
+      if(toolView.classList.contains('open')) closeTool();
     }
+  });
 
-    // Render categories and featured
-    const categoriesGrid = document.getElementById('categoriesGrid');
-    const featuredGrid = document.getElementById('featuredGrid');
-
-    function renderCategories(){
-      categoriesGrid.innerHTML = '';
-      DATA.categories.forEach(c => {
-        const el = document.createElement('div');
-        el.className = 'card';
-        el.innerHTML = `
-          <div class="icon">${c.icon}</div>
-          <div class="title">${c.title}</div>
-          <div class="desc">${c.description}</div>
-        `;
-        el.addEventListener('click', () => openCategory(c.id));
-        categoriesGrid.appendChild(el);
-      });
-    }
-
-    function renderFeatured(){
-      featuredGrid.innerHTML = '';
-      DATA.tools.slice(0,6).forEach(t => {
-        const el = document.createElement('div');
-        el.className = 'card';
-        el.innerHTML = `
-          <div class="title">${t.title}</div>
-          <div class="desc">${t.shortDescription}</div>
-          <div class="tool-actions">
-            <button class="btn btn-primary" data-open="${t.slug}">Open</button>
-            <button class="btn btn-ghost">Preview</button>
-          </div>
-        `;
-        el.querySelector('[data-open]').addEventListener('click', () => openTool(t.slug));
-        featuredGrid.appendChild(el);
-      });
-    }
-
-    // Category page
-    const categoryTitle = document.getElementById('categoryTitle');
-    const categoryDesc = document.getElementById('categoryDesc');
-    const categoryTools = document.getElementById('categoryTools');
-    function openCategory(id){
-      const cat = DATA.categories.find(c => c.id===id);
-      if(!cat) return;
-      categoryTitle.textContent = cat.title;
-      categoryDesc.textContent = cat.description;
-      categoryTools.innerHTML = '';
-      const tools = DATA.tools.filter(t => t.categoryId===id);
-      tools.forEach(t => {
-        const el = document.createElement('div');
-        el.className='card';
-        el.innerHTML = `
-          <div class="title">${t.title}</div>
-          <div class="desc">${t.shortDescription}</div>
-          <div class="tool-actions">
-            <button class="btn btn-primary" data-open="${t.slug}">Open</button>
-          </div>
-        `;
-        el.querySelector('[data-open]').addEventListener('click', ()=> openTool(t.slug));
-        categoryTools.appendChild(el);
-      });
-      showPage('category');
-    }
-
-    // Tool page
-    const toolTitle = document.getElementById('toolTitle');
-    const toolDesc = document.getElementById('toolDesc');
-    const toolShell = document.getElementById('toolShell');
-
-    function openTool(slug){
-      const tool = DATA.tools.find(t => t.slug===slug);
-      if(!tool) return;
-      toolTitle.textContent = tool.title;
-      toolDesc.textContent = tool.shortDescription;
-      toolShell.innerHTML = '';
-      if(tool.type === 'bmi'){
-        renderBmi(toolShell);
-      } else if(tool.type === 'age'){
-        renderAge(toolShell);
-      } else {
-        toolShell.textContent = 'Tool not supported yet.';
-      }
-      showPage('tool');
-    }
-
-    // Simple BMI tool
-    function renderBmi(container){
-      container.innerHTML = `
-        <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
-          <div>
-            <div class="form-row"><label>Weight (kg)</label><input class="input" id="bmiWeight" value="60" /></div>
-            <div class="form-row"><label>Height (cm)</label><input class="input" id="bmiHeight" value="170" /></div>
-            <div><button class="btn btn-primary" id="bmiCalc">Calculate</button></div>
-          </div>
-          <div>
-            <div class="result-card">
-              <div style="color:var(--muted)">Your BMI</div>
-              <div id="bmiResult" style="font-size:28px; font-weight:700; margin-top:6px;">—</div>
-              <div id="bmiCat" style="margin-top:8px; color:var(--muted)"></div>
-            </div>
-          </div>
-        </div>
-      `;
-      const w = container.querySelector('#bmiWeight');
-      const h = container.querySelector('#bmiHeight');
-      const btn = container.querySelector('#bmiCalc');
-      const out = container.querySelector('#bmiResult');
-      const cat = container.querySelector('#bmiCat');
-      function compute(){
-        const W = parseFloat(w.value)||0;
-        const H = (parseFloat(h.value)||0)/100;
-        if(!W||!H){ out.textContent='—'; cat.textContent=''; return; }
-        const bmi = W/(H*H);
-        out.textContent = bmi.toFixed(1);
-        let c='—';
-        if(bmi>0){
-          if(bmi<18.5) c='Underweight';
-          else if(bmi<25) c='Normal';
-          else if(bmi<30) c='Overweight';
-          else c='Obese';
-        }
-        cat.textContent = c;
-      }
-      btn.addEventListener('click', compute);
-      // live update
-      w.addEventListener('input', compute);
-      h.addEventListener('input', compute);
-      compute();
-    }
-
-    // Simple Age tool
-    function renderAge(container){
-      container.innerHTML = `
-        <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
-          <div>
-            <div class="form-row"><label>Date of Birth</label><input type="date" class="input" id="ageDob" /></div>
-          </div>
-          <div>
-            <div class="result-card">
-              <div style="color:var(--muted)">Your Age</div>
-              <div id="ageResult" style="font-size:28px; font-weight:700; margin-top:6px;">—</div>
-            </div>
-          </div>
-        </div>
-      `;
-      const dob = container.querySelector('#ageDob');
-      const out = container.querySelector('#ageResult');
-      function compute(){
-        if(!dob.value){ out.textContent='—'; return; }
-        const d = new Date(dob.value);
-        if(isNaN(d)){ out.textContent='—'; return; }
-        const diff = Date.now() - d.getTime();
-        const y = new Date(diff).getUTCFullYear() - 1970;
-        out.textContent = y + ' yrs';
-      }
-      dob.addEventListener('change', compute);
-    }
-
-    // Navigation handlers
-    document.getElementById('catBack').addEventListener('click', ()=> showPage('home'));
-    document.getElementById('toolBack').addEventListener('click', ()=> {
-      // go back to category if we can find it, else home
-      showPage('home');
+  // Categories click -> show category view (simple breadcrumb update + scroll)
+  qa('#categories .card').forEach(card => {
+    card.addEventListener('click', () => {
+      const slug = card.getAttribute('data-slug');
+      // Simulate navigation: update breadcrumb line in hero area
+      const title = card.querySelector('strong').innerText;
+      // Update hero to show we are on category page
+      // For simplicity, we'll scroll to featured and update small breadcrumb text
+      alert('Open category: ' + title + '\\n(For full category page, implement route /categories/' + slug + ')');
     });
-    document.getElementById('brand').addEventListener('click', ()=> showPage('home'));
+    card.addEventListener('keydown', e => { if(e.key==='Enter') card.click(); });
+  });
 
-    // Search (very simple)
-    const searchInput = document.getElementById('globalSearch');
-    searchInput.addEventListener('keydown', function(e){
-      if(e.key === 'Enter'){
-        const q = searchInput.value.trim().toLowerCase();
-        if(!q) return;
-        const found = DATA.tools.find(t => t.title.toLowerCase().includes(q) || (t.shortDescription||'').toLowerCase().includes(q));
-        if(found) openTool(found.slug);
-      }
+  // Tool card open
+  const toolCards = qa('.tool-card');
+  const toolView = q('#toolView');
+  const toolClose = q('#toolClose');
+  const calcBtn = q('#calcBtn');
+  const shareBtn = q('#shareBtn');
+  const weightInput = q('#weight');
+  const heightInput = q('#height');
+  const bmiValue = q('#bmiValue');
+  const bmiText = q('#bmiText');
+  const toolTitle = q('#toolTitle');
+  const toolBreadcrumb = q('#toolBreadcrumb');
+
+  toolCards.forEach(tc => {
+    tc.addEventListener('click', () => openTool(tc.getAttribute('data-tool')));
+    tc.addEventListener('keydown', e=> { if(e.key==='Enter') openTool(tc.getAttribute('data-tool')); });
+  });
+
+  function openTool(id){
+    // Only implementing a few tooling examples; open BMI view when clicked bmi-calculator
+    if(id === 'bmi-calculator'){
+      toolTitle.innerText = 'BMI Calculator';
+      toolBreadcrumb.innerText = 'Home > Calculators > BMI Calculator';
+      openToolModal();
+      calculateBMI(); // show default
+    } else {
+      // fallback: show simple details
+      toolTitle.innerText = id.replace(/[-]/g,' ').replace(/\\b\\w/g,c=>c.toUpperCase());
+      toolBreadcrumb.innerText = 'Home > Featured > ' + toolTitle.innerText;
+      openToolModal();
+      bmiValue.innerText = '--';
+      bmiText.innerText = 'Open tool';
+    }
+  }
+  function openToolModal(){ toolView.classList.add('open'); toolView.setAttribute('aria-hidden','false'); }
+  function closeTool(){ toolView.classList.remove('open'); toolView.setAttribute('aria-hidden','true'); }
+
+  toolClose.addEventListener('click', closeTool);
+
+  // BMI calculation logic (client side)
+  function calculateBMI(){
+    const w = parseFloat(weightInput.value) || 0;
+    const hcm = parseFloat(heightInput.value) || 0;
+    if(w <= 0 || hcm <= 0){
+      bmiValue.innerText = '--';
+      bmiText.innerText = 'Enter valid inputs';
+      return;
+    }
+    const h = hcm / 100;
+    const bmi = w / (h*h);
+    const rounded = Math.round(bmi * 10) / 10;
+    bmiValue.innerText = rounded.toFixed(1);
+    let text = 'Normal';
+    if(rounded < 18.5) text = 'Underweight';
+    else if(rounded >= 25) text = 'Overweight';
+    if(rounded >= 30) text = 'Obese';
+    bmiText.innerText = text;
+    // update share URL encoded in query params (non-destructive)
+    const url = new URL(window.location);
+    url.searchParams.set('tool','bmi');
+    url.searchParams.set('weight', w);
+    url.searchParams.set('height', hcm);
+    // update history state (doesn't reload)
+    history.replaceState(null, '', url.toString());
+  }
+  calcBtn.addEventListener('click', calculateBMI);
+  weightInput.addEventListener('change', calculateBMI);
+  heightInput.addEventListener('change', calculateBMI);
+
+  // Share: copy shareable link
+  shareBtn.addEventListener('click', () => {
+    const url = location.href;
+    navigator.clipboard?.writeText(url).then(() => {
+      shareBtn.innerText = 'Copied!';
+      setTimeout(()=> shareBtn.innerText = 'Share', 1400);
+    }).catch(()=> {
+      alert('Copy this link:\\n' + url);
     });
+  });
 
-    // Mode toggle (light/dark)
-    const modeBtn = document.getElementById('modeToggle');
-    modeBtn.addEventListener('click', ()=>{
-      if(document.documentElement.style.getPropertyValue('--bg') === '#f7f7f8'){
-        // switch dark
-        document.documentElement.style.setProperty('--bg','#0b1220');
-        document.documentElement.style.setProperty('--card','#0f1724');
-        document.documentElement.style.setProperty('--muted','#9ca3af');
-        document.documentElement.style.setProperty('--accent','#60a5fa');
-        document.documentElement.style.setProperty('--shadow','none');
-        modeBtn.textContent = '☀️';
-        document.body.style.background = '#071127';
-      } else {
-        // light
-        document.documentElement.style.setProperty('--bg','#f7f7f8');
-        document.documentElement.style.setProperty('--card','#fff');
-        document.documentElement.style.setProperty('--muted','#6b7280');
-        document.documentElement.style.setProperty('--accent','#2563eb');
-        document.documentElement.style.setProperty('--shadow','0 6px 18px rgba(16,24,40,0.06)');
-        modeBtn.textContent = '🌙';
-        document.body.style.background = '';
-      }
-    });
-
-    // initial render
-    renderCategories();
-    renderFeatured();
-  </script>
-</body>
-</html>
+  // Search logic: very simple fuzzy client search against a small local index
+  const tools = [
+    {id:'bmi-calculator',title:'BMI Calculator',desc:'Quick BMI check.'},
+    {id:'pdf-to-word',title:'PDF to Word',desc:'Convert instantly.'},
+    {id:'age-calculator',title:'Age Calculator',desc:'Find age precisely.'},
+    {id:'random-name',title:'Random Name Generator',desc:'Create names quickly.'},
+    {id:'loan-calculator',title:'Loan Calculator',desc:'Estimate loan costs.'},
+    {id:'calorie-calculator',title:'Calorie Calculator',desc:'Daily calorie needs.'}
+  ];
+  const searchInput = q('#searchInput');
+  const suggestions = q('#searchSuggestions');
+  let searchTimeout = null;
+  searchInput.addEventListener('input', () => {
+    clearTimeout(searchTimeout);
+    searchTimeout = setTimeout(runSearch, 200);
+  });
+  function runSearch(){
+    const qv = (searchInput.value || '').trim().toLowerCase();
+    if(!qv){ suggestions.style.display='none'; return; }
+    const results = tools.filter(t => (t.title + ' ' + t.desc).toLowerCase().includes(qv));
+    suggestions.innerHTML = '';
+    if(results.length === 0){
+      suggestions.style.display='block';
+      suggestions.innerText = 'No results. Try "PDF" or "BMI".';
+      return;
+    }
+    results.slice(0,6).forEach(r => {
+      const el = document.createElement('button');
+      el.style.display='block';
+      el.style.padding='8px 12px';
+      el.style.border='0';
+      el.style.width='100%';
+      el.style.textAlign='left';
+      el.style.background='transparent
